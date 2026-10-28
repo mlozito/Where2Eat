@@ -23,9 +23,9 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'a51b4833fdaffe730572670ccc27dd89af7e0726ab3de7f428d21702d687cc15'>;
+  StorageHashBase<'2f42c64ad5eb05b8a74344ba0f014099fabdf58a6d7b18eb001d76fb11dc86c7'>;
 export type ExecutionHash =
-  ExecutionHashBase<'3730158042e7c88d23f35529e89ad90532db0cd5c528c13e701f93cb45aa8a9c'>;
+  ExecutionHashBase<'50f1e3d96e8f399abab3928ebd21e63f5812801b5224fe7b48a9c39b98c35304'>;
 export type ProfileHash =
   ProfileHashBase<'3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2'>;
 
@@ -238,7 +238,41 @@ type DefaultLiteralValue<CodecId extends string, Encoded> = CodecId extends keyo
   : Encoded;
 type ParameterizedOutputTypeFunctions = PgParameterizedOutputTypes;
 
-type FieldTypeOverrides = {};
+type FieldTypeOverrides = {
+  readonly public: {
+    readonly models: {
+      readonly Candidate: {
+        readonly source: {
+          readonly output: 'YELP' | 'USER_SUGGESTED';
+          readonly input: 'YELP' | 'USER_SUGGESTED';
+        };
+      };
+      readonly Group: {
+        readonly decisionType: {
+          readonly output: 'VOTE' | 'RANDOM' | 'BEST_FIT';
+          readonly input: 'VOTE' | 'RANDOM' | 'BEST_FIT';
+        };
+        readonly model: {
+          readonly output: 'SUGGESTION' | 'PREFERENCE';
+          readonly input: 'SUGGESTION' | 'PREFERENCE';
+        };
+        readonly status: {
+          readonly output: 'LOBBY' | 'COLLECTING' | 'DECIDING' | 'TIE_BREAK' | 'COMPLETE';
+          readonly input: 'LOBBY' | 'COLLECTING' | 'DECIDING' | 'TIE_BREAK' | 'COMPLETE';
+        };
+      };
+      readonly Result: {
+        readonly method: {
+          readonly output: 'VOTE' | 'RANDOM' | 'BEST_FIT' | 'TIE_RANDOM';
+          readonly input: 'VOTE' | 'RANDOM' | 'BEST_FIT' | 'TIE_RANDOM';
+        };
+      };
+      readonly Round: {
+        readonly status: { readonly output: 'OPEN' | 'CLOSED'; readonly input: 'OPEN' | 'CLOSED' };
+      };
+    };
+  };
+};
 export type FieldOutputTypes = FieldTypesFromDomain<
   ContractBase['domain']['namespaces'],
   CodecTypes,
@@ -253,7 +287,39 @@ export type FieldInputTypes = FieldTypesFromDomain<
   FieldTypeOverrides,
   'input'
 >;
-type ColumnTypeOverrides = {};
+type ColumnTypeOverrides = {
+  readonly public: {
+    readonly Candidate: {
+      readonly source: {
+        readonly output: 'YELP' | 'USER_SUGGESTED';
+        readonly input: 'YELP' | 'USER_SUGGESTED';
+      };
+    };
+    readonly Group: {
+      readonly decisionType: {
+        readonly output: 'VOTE' | 'RANDOM' | 'BEST_FIT';
+        readonly input: 'VOTE' | 'RANDOM' | 'BEST_FIT';
+      };
+      readonly model: {
+        readonly output: 'SUGGESTION' | 'PREFERENCE';
+        readonly input: 'SUGGESTION' | 'PREFERENCE';
+      };
+      readonly status: {
+        readonly output: 'LOBBY' | 'COLLECTING' | 'DECIDING' | 'TIE_BREAK' | 'COMPLETE';
+        readonly input: 'LOBBY' | 'COLLECTING' | 'DECIDING' | 'TIE_BREAK' | 'COMPLETE';
+      };
+    };
+    readonly Result: {
+      readonly method: {
+        readonly output: 'VOTE' | 'RANDOM' | 'BEST_FIT' | 'TIE_RANDOM';
+        readonly input: 'VOTE' | 'RANDOM' | 'BEST_FIT' | 'TIE_RANDOM';
+      };
+    };
+    readonly Round: {
+      readonly status: { readonly output: 'OPEN' | 'CLOSED'; readonly input: 'OPEN' | 'CLOSED' };
+    };
+  };
+};
 export type StorageColumnTypes = ColumnTypesFromStorage<
   ContractBase['storage'],
   CodecTypes,
@@ -270,32 +336,110 @@ export type StorageColumnInputTypes = ColumnTypesFromStorage<
 >;
 
 export namespace Models {
-  export type public_Post = {
-    authorId: FieldOutputTypes['public']['Post']['authorId'];
-    content: FieldOutputTypes['public']['Post']['content'];
-    createdAt: FieldOutputTypes['public']['Post']['createdAt'];
-    id: FieldOutputTypes['public']['Post']['id'];
-    title: FieldOutputTypes['public']['Post']['title'];
-    updatedAt: FieldOutputTypes['public']['Post']['updatedAt'];
-    author: public_User;
-    readonly [RelationKeys]?: 'author';
+  export type public_Candidate = {
+    createdAt: FieldOutputTypes['public']['Candidate']['createdAt'];
+    groupId: FieldOutputTypes['public']['Candidate']['groupId'];
+    id: FieldOutputTypes['public']['Candidate']['id'];
+    rank: FieldOutputTypes['public']['Candidate']['rank'];
+    snapshot: FieldOutputTypes['public']['Candidate']['snapshot'];
+    source: FieldOutputTypes['public']['Candidate']['source'];
+    suggestedByMemberId: FieldOutputTypes['public']['Candidate']['suggestedByMemberId'];
+    yelpBusinessId: FieldOutputTypes['public']['Candidate']['yelpBusinessId'];
+    group: public_Group;
+    results: public_Result[];
+    roundEntries: public_RoundCandidate[];
+    suggestedBy: public_Member | null;
+    votes: public_Vote[];
+    readonly [RelationKeys]?: 'group' | 'results' | 'roundEntries' | 'suggestedBy' | 'votes';
   };
-  export type public_User = {
-    createdAt: FieldOutputTypes['public']['User']['createdAt'];
-    email: FieldOutputTypes['public']['User']['email'];
-    id: FieldOutputTypes['public']['User']['id'];
-    name: FieldOutputTypes['public']['User']['name'];
-    updatedAt: FieldOutputTypes['public']['User']['updatedAt'];
-    username: FieldOutputTypes['public']['User']['username'];
-    posts: public_Post[];
-    readonly [RelationKeys]?: 'posts';
+  export type public_Group = {
+    createdAt: FieldOutputTypes['public']['Group']['createdAt'];
+    decisionType: FieldOutputTypes['public']['Group']['decisionType'];
+    id: FieldOutputTypes['public']['Group']['id'];
+    inviteCode: FieldOutputTypes['public']['Group']['inviteCode'];
+    model: FieldOutputTypes['public']['Group']['model'];
+    status: FieldOutputTypes['public']['Group']['status'];
+    updatedAt: FieldOutputTypes['public']['Group']['updatedAt'];
+    candidates: public_Candidate[];
+    members: public_Member[];
+    result: public_Result | null;
+    rounds: public_Round[];
+    readonly [RelationKeys]?: 'candidates' | 'members' | 'result' | 'rounds';
+  };
+  export type public_Member = {
+    createdAt: FieldOutputTypes['public']['Member']['createdAt'];
+    displayName: FieldOutputTypes['public']['Member']['displayName'];
+    groupId: FieldOutputTypes['public']['Member']['groupId'];
+    id: FieldOutputTypes['public']['Member']['id'];
+    isHost: FieldOutputTypes['public']['Member']['isHost'];
+    sessionTokenHash: FieldOutputTypes['public']['Member']['sessionTokenHash'];
+    group: public_Group;
+    preference: public_Preference | null;
+    suggestions: public_Candidate[];
+    votes: public_Vote[];
+    readonly [RelationKeys]?: 'group' | 'preference' | 'suggestions' | 'votes';
+  };
+  export type public_Preference = {
+    cuisines: FieldOutputTypes['public']['Preference']['cuisines'];
+    dietaryRestrictions: FieldOutputTypes['public']['Preference']['dietaryRestrictions'];
+    id: FieldOutputTypes['public']['Preference']['id'];
+    maxDistanceMeters: FieldOutputTypes['public']['Preference']['maxDistanceMeters'];
+    memberId: FieldOutputTypes['public']['Preference']['memberId'];
+    priceLevels: FieldOutputTypes['public']['Preference']['priceLevels'];
+    member: public_Member;
+    readonly [RelationKeys]?: 'member';
+  };
+  export type public_Result = {
+    candidateId: FieldOutputTypes['public']['Result']['candidateId'];
+    chosenAt: FieldOutputTypes['public']['Result']['chosenAt'];
+    groupId: FieldOutputTypes['public']['Result']['groupId'];
+    id: FieldOutputTypes['public']['Result']['id'];
+    method: FieldOutputTypes['public']['Result']['method'];
+    candidate: public_Candidate;
+    group: public_Group;
+    readonly [RelationKeys]?: 'candidate' | 'group';
+  };
+  export type public_Round = {
+    createdAt: FieldOutputTypes['public']['Round']['createdAt'];
+    groupId: FieldOutputTypes['public']['Round']['groupId'];
+    id: FieldOutputTypes['public']['Round']['id'];
+    number: FieldOutputTypes['public']['Round']['number'];
+    status: FieldOutputTypes['public']['Round']['status'];
+    candidates: public_RoundCandidate[];
+    group: public_Group;
+    votes: public_Vote[];
+    readonly [RelationKeys]?: 'candidates' | 'group' | 'votes';
+  };
+  export type public_RoundCandidate = {
+    candidateId: FieldOutputTypes['public']['RoundCandidate']['candidateId'];
+    roundId: FieldOutputTypes['public']['RoundCandidate']['roundId'];
+    candidate: public_Candidate;
+    round: public_Round;
+    readonly [RelationKeys]?: 'candidate' | 'round';
+  };
+  export type public_Vote = {
+    candidateId: FieldOutputTypes['public']['Vote']['candidateId'];
+    createdAt: FieldOutputTypes['public']['Vote']['createdAt'];
+    id: FieldOutputTypes['public']['Vote']['id'];
+    memberId: FieldOutputTypes['public']['Vote']['memberId'];
+    roundId: FieldOutputTypes['public']['Vote']['roundId'];
+    candidate: public_Candidate;
+    member: public_Member;
+    round: public_Round;
+    readonly [RelationKeys]?: 'candidate' | 'member' | 'round';
   };
 }
 
 export declare const models: {
   public: {
-    Post: Models.public_Post;
-    User: Models.public_User;
+    Candidate: Models.public_Candidate;
+    Group: Models.public_Group;
+    Member: Models.public_Member;
+    Preference: Models.public_Preference;
+    Result: Models.public_Result;
+    Round: Models.public_Round;
+    RoundCandidate: Models.public_RoundCandidate;
+    Vote: Models.public_Vote;
   };
 };
 
@@ -317,20 +461,8 @@ type ContractBase = Omit<
         readonly kind: 'postgres-schema';
         readonly entries: {
           readonly table: {
-            readonly Post: {
+            readonly Candidate: {
               columns: {
-                readonly authorId: {
-                  readonly dataType: 'pg/int4';
-                  readonly codecId: 'pg/int4@1';
-                  readonly nullable: false;
-                  readonly many: false;
-                };
-                readonly content: {
-                  readonly dataType: 'pg/text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: true;
-                  readonly many: false;
-                };
                 readonly createdAt: {
                   readonly dataType: 'pg/timestamptz';
                   readonly codecId: 'pg/timestamptz-string@1';
@@ -338,26 +470,46 @@ type ContractBase = Omit<
                   readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
                   readonly many: false;
                 };
-                readonly id: {
-                  readonly dataType: 'pg/int4';
-                  readonly codecId: 'pg/int4@1';
-                  readonly nullable: false;
-                  readonly default: {
-                    readonly kind: 'function';
-                    readonly expression: 'autoincrement()';
-                  };
-                  readonly many: false;
-                };
-                readonly title: {
+                readonly groupId: {
                   readonly dataType: 'pg/text';
                   readonly codecId: 'pg/text@1';
                   readonly nullable: false;
                   readonly many: false;
                 };
-                readonly updatedAt: {
-                  readonly dataType: 'pg/timestamptz';
-                  readonly codecId: 'pg/timestamptz-string@1';
+                readonly id: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
                   readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly rank: {
+                  readonly dataType: 'pg/int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly snapshot: {
+                  readonly dataType: 'pg/json';
+                  readonly codecId: 'pg/json@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly source: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly suggestedByMemberId: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly yelpBusinessId: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
                   readonly many: false;
                 };
               };
@@ -365,9 +517,15 @@ type ContractBase = Omit<
               uniques: readonly [];
               indexes: readonly [
                 {
-                  readonly name: 'Post_authorId_idx_e47547ed';
-                  readonly prefix: 'Post_authorId_idx';
-                  readonly columns: readonly ['authorId'];
+                  readonly name: 'Candidate_groupId_idx_e2fb5578';
+                  readonly prefix: 'Candidate_groupId_idx';
+                  readonly columns: readonly ['groupId'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'Candidate_suggestedByMemberId_idx_876a7f90';
+                  readonly prefix: 'Candidate_suggestedByMemberId_idx';
+                  readonly columns: readonly ['suggestedByMemberId'];
                   readonly unique: false;
                 },
               ];
@@ -375,18 +533,30 @@ type ContractBase = Omit<
                 {
                   readonly source: {
                     readonly namespaceId: 'public' & NamespaceId;
-                    readonly tableName: 'Post';
-                    readonly columns: readonly ['authorId'];
+                    readonly tableName: 'Candidate';
+                    readonly columns: readonly ['groupId'];
                   };
                   readonly target: {
                     readonly namespaceId: 'public' & NamespaceId;
-                    readonly tableName: 'User';
+                    readonly tableName: 'Group';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'Candidate';
+                    readonly columns: readonly ['suggestedByMemberId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'Member';
                     readonly columns: readonly ['id'];
                   };
                 },
               ];
             };
-            readonly User: {
+            readonly Group: {
               columns: {
                 readonly createdAt: {
                   readonly dataType: 'pg/timestamptz';
@@ -395,26 +565,38 @@ type ContractBase = Omit<
                   readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
                   readonly many: false;
                 };
-                readonly email: {
-                  readonly dataType: 'pg/text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
-                  readonly many: false;
-                };
-                readonly id: {
-                  readonly dataType: 'pg/int4';
-                  readonly codecId: 'pg/int4@1';
-                  readonly nullable: false;
-                  readonly default: {
-                    readonly kind: 'function';
-                    readonly expression: 'autoincrement()';
-                  };
-                  readonly many: false;
-                };
-                readonly name: {
+                readonly decisionType: {
                   readonly dataType: 'pg/text';
                   readonly codecId: 'pg/text@1';
                   readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly id: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly inviteCode: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly model: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly status: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/text@1', 'LOBBY'>;
+                  };
                   readonly many: false;
                 };
                 readonly updatedAt: {
@@ -423,17 +605,459 @@ type ContractBase = Omit<
                   readonly nullable: false;
                   readonly many: false;
                 };
-                readonly username: {
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [{ readonly columns: readonly ['inviteCode'] }];
+              indexes: readonly [];
+              foreignKeys: readonly [];
+            };
+            readonly Member: {
+              columns: {
+                readonly createdAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                  readonly many: false;
+                };
+                readonly displayName: {
                   readonly dataType: 'pg/text';
                   readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly groupId: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly id: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly isHost: {
+                  readonly dataType: 'pg/bool';
+                  readonly codecId: 'pg/bool@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/bool@1', false>;
+                  };
+                  readonly many: false;
+                };
+                readonly sessionTokenHash: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [
+                { readonly columns: readonly ['sessionTokenHash'] },
+                { readonly columns: readonly ['groupId', 'displayName'] },
+              ];
+              indexes: readonly [
+                {
+                  readonly name: 'Member_groupId_idx_e2fb5578';
+                  readonly prefix: 'Member_groupId_idx';
+                  readonly columns: readonly ['groupId'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'Member';
+                    readonly columns: readonly ['groupId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'Group';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+              ];
+            };
+            readonly Preference: {
+              columns: {
+                readonly cuisines: {
+                  readonly dataType: 'pg/json';
+                  readonly codecId: 'pg/json@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly dietaryRestrictions: {
+                  readonly dataType: 'pg/json';
+                  readonly codecId: 'pg/json@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly id: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly maxDistanceMeters: {
+                  readonly dataType: 'pg/int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly memberId: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly priceLevels: {
+                  readonly dataType: 'pg/json';
+                  readonly codecId: 'pg/json@1';
                   readonly nullable: true;
                   readonly many: false;
                 };
               };
               primaryKey: { readonly columns: readonly ['id'] };
-              uniques: readonly [{ readonly columns: readonly ['email'] }];
+              uniques: readonly [{ readonly columns: readonly ['memberId'] }];
               indexes: readonly [];
-              foreignKeys: readonly [];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'Preference';
+                    readonly columns: readonly ['memberId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'Member';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+              ];
+            };
+            readonly Result: {
+              columns: {
+                readonly candidateId: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly chosenAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                  readonly many: false;
+                };
+                readonly groupId: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly id: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly method: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [{ readonly columns: readonly ['groupId'] }];
+              indexes: readonly [
+                {
+                  readonly name: 'Result_candidateId_idx_462b5869';
+                  readonly prefix: 'Result_candidateId_idx';
+                  readonly columns: readonly ['candidateId'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'Result';
+                    readonly columns: readonly ['groupId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'Group';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'Result';
+                    readonly columns: readonly ['candidateId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'Candidate';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+              ];
+            };
+            readonly Round: {
+              columns: {
+                readonly createdAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                  readonly many: false;
+                };
+                readonly groupId: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly id: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly number: {
+                  readonly dataType: 'pg/int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly status: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/text@1', 'OPEN'>;
+                  };
+                  readonly many: false;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [{ readonly columns: readonly ['groupId', 'number'] }];
+              indexes: readonly [
+                {
+                  readonly name: 'Round_groupId_idx_e2fb5578';
+                  readonly prefix: 'Round_groupId_idx';
+                  readonly columns: readonly ['groupId'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'Round';
+                    readonly columns: readonly ['groupId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'Group';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+              ];
+            };
+            readonly RoundCandidate: {
+              columns: {
+                readonly candidateId: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly roundId: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['roundId', 'candidateId'] };
+              uniques: readonly [];
+              indexes: readonly [
+                {
+                  readonly name: 'RoundCandidate_candidateId_idx_462b5869';
+                  readonly prefix: 'RoundCandidate_candidateId_idx';
+                  readonly columns: readonly ['candidateId'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'RoundCandidate_roundId_idx_b7564116';
+                  readonly prefix: 'RoundCandidate_roundId_idx';
+                  readonly columns: readonly ['roundId'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'RoundCandidate';
+                    readonly columns: readonly ['roundId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'Round';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'RoundCandidate';
+                    readonly columns: readonly ['candidateId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'Candidate';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+              ];
+            };
+            readonly Vote: {
+              columns: {
+                readonly candidateId: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly createdAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                  readonly many: false;
+                };
+                readonly id: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly memberId: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly roundId: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [{ readonly columns: readonly ['roundId', 'memberId'] }];
+              indexes: readonly [
+                {
+                  readonly name: 'Vote_candidateId_idx_462b5869';
+                  readonly prefix: 'Vote_candidateId_idx';
+                  readonly columns: readonly ['candidateId'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'Vote_memberId_idx_76b3c263';
+                  readonly prefix: 'Vote_memberId_idx';
+                  readonly columns: readonly ['memberId'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'Vote_roundId_idx_b7564116';
+                  readonly prefix: 'Vote_roundId_idx';
+                  readonly columns: readonly ['roundId'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'Vote';
+                    readonly columns: readonly ['roundId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'Round';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'Vote';
+                    readonly columns: readonly ['memberId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'Member';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'Vote';
+                    readonly columns: readonly ['candidateId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'Candidate';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+              ];
+            };
+          };
+          readonly valueSet: {
+            readonly CandidateSource: {
+              readonly kind: 'valueSet';
+              readonly values: readonly ['YELP', 'USER_SUGGESTED'];
+            };
+            readonly DecisionType: {
+              readonly kind: 'valueSet';
+              readonly values: readonly ['VOTE', 'RANDOM', 'BEST_FIT'];
+            };
+            readonly GroupModel: {
+              readonly kind: 'valueSet';
+              readonly values: readonly ['SUGGESTION', 'PREFERENCE'];
+            };
+            readonly GroupStatus: {
+              readonly kind: 'valueSet';
+              readonly values: readonly [
+                'LOBBY',
+                'COLLECTING',
+                'DECIDING',
+                'TIE_BREAK',
+                'COMPLETE',
+              ];
+            };
+            readonly ResultMethod: {
+              readonly kind: 'valueSet';
+              readonly values: readonly ['VOTE', 'RANDOM', 'BEST_FIT', 'TIE_RANDOM'];
+            };
+            readonly RoundStatus: {
+              readonly kind: 'valueSet';
+              readonly values: readonly ['OPEN', 'CLOSED'];
             };
           };
         };
@@ -446,23 +1070,27 @@ type ContractBase = Omit<
   readonly target: 'postgres';
   readonly targetFamily: 'sql';
   readonly roots: {
-    readonly Post: { readonly namespace: 'public' & NamespaceId; readonly model: 'Post' };
-    readonly User: { readonly namespace: 'public' & NamespaceId; readonly model: 'User' };
+    readonly Candidate: { readonly namespace: 'public' & NamespaceId; readonly model: 'Candidate' };
+    readonly Group: { readonly namespace: 'public' & NamespaceId; readonly model: 'Group' };
+    readonly Member: { readonly namespace: 'public' & NamespaceId; readonly model: 'Member' };
+    readonly Preference: {
+      readonly namespace: 'public' & NamespaceId;
+      readonly model: 'Preference';
+    };
+    readonly Result: { readonly namespace: 'public' & NamespaceId; readonly model: 'Result' };
+    readonly Round: { readonly namespace: 'public' & NamespaceId; readonly model: 'Round' };
+    readonly RoundCandidate: {
+      readonly namespace: 'public' & NamespaceId;
+      readonly model: 'RoundCandidate';
+    };
+    readonly Vote: { readonly namespace: 'public' & NamespaceId; readonly model: 'Vote' };
   };
   readonly domain: {
     readonly namespaces: {
       readonly public: {
         readonly models: {
-          readonly Post: {
+          readonly Candidate: {
             readonly fields: {
-              readonly authorId: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
-              };
-              readonly content: {
-                readonly nullable: true;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
               readonly createdAt: {
                 readonly nullable: false;
                 readonly type: {
@@ -470,11 +1098,132 @@ type ContractBase = Omit<
                   readonly codecId: 'pg/timestamptz-string@1';
                 };
               };
+              readonly groupId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
               readonly id: {
                 readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly rank: {
+                readonly nullable: true;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
               };
-              readonly title: {
+              readonly snapshot: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/json@1' };
+              };
+              readonly source: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly suggestedByMemberId: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly yelpBusinessId: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+            };
+            readonly relations: {
+              readonly group: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'Group';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['groupId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly results: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'Result';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['candidateId'];
+                };
+              };
+              readonly roundEntries: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'RoundCandidate';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['candidateId'];
+                };
+              };
+              readonly suggestedBy: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'Member';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: true;
+                readonly on: {
+                  readonly localFields: readonly ['suggestedByMemberId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly votes: {
+                readonly to: { readonly namespace: 'public' & NamespaceId; readonly model: 'Vote' };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['candidateId'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'Candidate';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly createdAt: { readonly column: 'createdAt' };
+                readonly groupId: { readonly column: 'groupId' };
+                readonly id: { readonly column: 'id' };
+                readonly rank: { readonly column: 'rank' };
+                readonly snapshot: { readonly column: 'snapshot' };
+                readonly source: { readonly column: 'source' };
+                readonly suggestedByMemberId: { readonly column: 'suggestedByMemberId' };
+                readonly yelpBusinessId: { readonly column: 'yelpBusinessId' };
+              };
+            };
+          };
+          readonly Group: {
+            readonly fields: {
+              readonly createdAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                };
+              };
+              readonly decisionType: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly inviteCode: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly model: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly status: {
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
@@ -487,30 +1236,273 @@ type ContractBase = Omit<
               };
             };
             readonly relations: {
-              readonly author: {
-                readonly to: { readonly namespace: 'public' & NamespaceId; readonly model: 'User' };
+              readonly candidates: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'Candidate';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['groupId'];
+                };
+              };
+              readonly members: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'Member';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['groupId'];
+                };
+              };
+              readonly result: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'Result';
+                };
+                readonly cardinality: '1:1';
+                readonly nullable: true;
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['groupId'];
+                };
+              };
+              readonly rounds: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'Round';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['groupId'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'Group';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly createdAt: { readonly column: 'createdAt' };
+                readonly decisionType: { readonly column: 'decisionType' };
+                readonly id: { readonly column: 'id' };
+                readonly inviteCode: { readonly column: 'inviteCode' };
+                readonly model: { readonly column: 'model' };
+                readonly status: { readonly column: 'status' };
+                readonly updatedAt: { readonly column: 'updatedAt' };
+              };
+            };
+          };
+          readonly Member: {
+            readonly fields: {
+              readonly createdAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                };
+              };
+              readonly displayName: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly groupId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly isHost: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/bool@1' };
+              };
+              readonly sessionTokenHash: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+            };
+            readonly relations: {
+              readonly group: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'Group';
+                };
                 readonly cardinality: 'N:1';
                 readonly nullable: false;
                 readonly on: {
-                  readonly localFields: readonly ['authorId'];
+                  readonly localFields: readonly ['groupId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly preference: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'Preference';
+                };
+                readonly cardinality: '1:1';
+                readonly nullable: true;
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['memberId'];
+                };
+              };
+              readonly suggestions: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'Candidate';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['suggestedByMemberId'];
+                };
+              };
+              readonly votes: {
+                readonly to: { readonly namespace: 'public' & NamespaceId; readonly model: 'Vote' };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['memberId'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'Member';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly createdAt: { readonly column: 'createdAt' };
+                readonly displayName: { readonly column: 'displayName' };
+                readonly groupId: { readonly column: 'groupId' };
+                readonly id: { readonly column: 'id' };
+                readonly isHost: { readonly column: 'isHost' };
+                readonly sessionTokenHash: { readonly column: 'sessionTokenHash' };
+              };
+            };
+          };
+          readonly Preference: {
+            readonly fields: {
+              readonly cuisines: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/json@1' };
+              };
+              readonly dietaryRestrictions: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/json@1' };
+              };
+              readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly maxDistanceMeters: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly memberId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly priceLevels: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/json@1' };
+              };
+            };
+            readonly relations: {
+              readonly member: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'Member';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['memberId'];
                   readonly targetFields: readonly ['id'];
                 };
               };
             };
             readonly storage: {
-              readonly table: 'Post';
+              readonly table: 'Preference';
               readonly namespaceId: 'public';
               readonly fields: {
-                readonly authorId: { readonly column: 'authorId' };
-                readonly content: { readonly column: 'content' };
-                readonly createdAt: { readonly column: 'createdAt' };
+                readonly cuisines: { readonly column: 'cuisines' };
+                readonly dietaryRestrictions: { readonly column: 'dietaryRestrictions' };
                 readonly id: { readonly column: 'id' };
-                readonly title: { readonly column: 'title' };
-                readonly updatedAt: { readonly column: 'updatedAt' };
+                readonly maxDistanceMeters: { readonly column: 'maxDistanceMeters' };
+                readonly memberId: { readonly column: 'memberId' };
+                readonly priceLevels: { readonly column: 'priceLevels' };
               };
             };
           };
-          readonly User: {
+          readonly Result: {
+            readonly fields: {
+              readonly candidateId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly chosenAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                };
+              };
+              readonly groupId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly method: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+            };
+            readonly relations: {
+              readonly candidate: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'Candidate';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['candidateId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly group: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'Group';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['groupId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'Result';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly candidateId: { readonly column: 'candidateId' };
+                readonly chosenAt: { readonly column: 'chosenAt' };
+                readonly groupId: { readonly column: 'groupId' };
+                readonly id: { readonly column: 'id' };
+                readonly method: { readonly column: 'method' };
+              };
+            };
+          };
+          readonly Round: {
             readonly fields: {
               readonly createdAt: {
                 readonly nullable: false;
@@ -519,53 +1511,272 @@ type ContractBase = Omit<
                   readonly codecId: 'pg/timestamptz-string@1';
                 };
               };
-              readonly email: {
+              readonly groupId: {
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
               readonly id: {
                 readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
-              };
-              readonly name: {
-                readonly nullable: true;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
-              readonly updatedAt: {
+              readonly number: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly status: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+            };
+            readonly relations: {
+              readonly candidates: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'RoundCandidate';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['roundId'];
+                };
+              };
+              readonly group: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'Group';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['groupId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly votes: {
+                readonly to: { readonly namespace: 'public' & NamespaceId; readonly model: 'Vote' };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['roundId'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'Round';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly createdAt: { readonly column: 'createdAt' };
+                readonly groupId: { readonly column: 'groupId' };
+                readonly id: { readonly column: 'id' };
+                readonly number: { readonly column: 'number' };
+                readonly status: { readonly column: 'status' };
+              };
+            };
+          };
+          readonly RoundCandidate: {
+            readonly fields: {
+              readonly candidateId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly roundId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+            };
+            readonly relations: {
+              readonly candidate: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'Candidate';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['candidateId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly round: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'Round';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['roundId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'RoundCandidate';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly candidateId: { readonly column: 'candidateId' };
+                readonly roundId: { readonly column: 'roundId' };
+              };
+            };
+          };
+          readonly Vote: {
+            readonly fields: {
+              readonly candidateId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly createdAt: {
                 readonly nullable: false;
                 readonly type: {
                   readonly kind: 'scalar';
                   readonly codecId: 'pg/timestamptz-string@1';
                 };
               };
-              readonly username: {
-                readonly nullable: true;
+              readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly memberId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly roundId: {
+                readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
             };
             readonly relations: {
-              readonly posts: {
-                readonly to: { readonly namespace: 'public' & NamespaceId; readonly model: 'Post' };
-                readonly cardinality: '1:N';
+              readonly candidate: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'Candidate';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
                 readonly on: {
-                  readonly localFields: readonly ['id'];
-                  readonly targetFields: readonly ['authorId'];
+                  readonly localFields: readonly ['candidateId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly member: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'Member';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['memberId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly round: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'Round';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['roundId'];
+                  readonly targetFields: readonly ['id'];
                 };
               };
             };
             readonly storage: {
-              readonly table: 'User';
+              readonly table: 'Vote';
               readonly namespaceId: 'public';
               readonly fields: {
+                readonly candidateId: { readonly column: 'candidateId' };
                 readonly createdAt: { readonly column: 'createdAt' };
-                readonly email: { readonly column: 'email' };
                 readonly id: { readonly column: 'id' };
-                readonly name: { readonly column: 'name' };
-                readonly updatedAt: { readonly column: 'updatedAt' };
-                readonly username: { readonly column: 'username' };
+                readonly memberId: { readonly column: 'memberId' };
+                readonly roundId: { readonly column: 'roundId' };
               };
             };
           };
+        };
+        readonly enum: {
+          readonly CandidateSource: {
+            readonly codecId: 'pg/text@1';
+            readonly members: readonly [
+              { readonly name: 'YELP'; readonly value: 'YELP' },
+              { readonly name: 'USER_SUGGESTED'; readonly value: 'USER_SUGGESTED' },
+            ];
+          };
+          readonly DecisionType: {
+            readonly codecId: 'pg/text@1';
+            readonly members: readonly [
+              { readonly name: 'VOTE'; readonly value: 'VOTE' },
+              { readonly name: 'RANDOM'; readonly value: 'RANDOM' },
+              { readonly name: 'BEST_FIT'; readonly value: 'BEST_FIT' },
+            ];
+          };
+          readonly GroupModel: {
+            readonly codecId: 'pg/text@1';
+            readonly members: readonly [
+              { readonly name: 'SUGGESTION'; readonly value: 'SUGGESTION' },
+              { readonly name: 'PREFERENCE'; readonly value: 'PREFERENCE' },
+            ];
+          };
+          readonly GroupStatus: {
+            readonly codecId: 'pg/text@1';
+            readonly members: readonly [
+              { readonly name: 'LOBBY'; readonly value: 'LOBBY' },
+              { readonly name: 'COLLECTING'; readonly value: 'COLLECTING' },
+              { readonly name: 'DECIDING'; readonly value: 'DECIDING' },
+              { readonly name: 'TIE_BREAK'; readonly value: 'TIE_BREAK' },
+              { readonly name: 'COMPLETE'; readonly value: 'COMPLETE' },
+            ];
+          };
+          readonly ResultMethod: {
+            readonly codecId: 'pg/text@1';
+            readonly members: readonly [
+              { readonly name: 'VOTE'; readonly value: 'VOTE' },
+              { readonly name: 'RANDOM'; readonly value: 'RANDOM' },
+              { readonly name: 'BEST_FIT'; readonly value: 'BEST_FIT' },
+              { readonly name: 'TIE_RANDOM'; readonly value: 'TIE_RANDOM' },
+            ];
+          };
+          readonly RoundStatus: {
+            readonly codecId: 'pg/text@1';
+            readonly members: readonly [
+              { readonly name: 'OPEN'; readonly value: 'OPEN' },
+              { readonly name: 'CLOSED'; readonly value: 'CLOSED' },
+            ];
+          };
+        };
+        readonly enumMemberTypes?: {
+          readonly CandidateSource: readonly [
+            { readonly name: 'YELP'; readonly value: 'YELP' },
+            { readonly name: 'USER_SUGGESTED'; readonly value: 'USER_SUGGESTED' },
+          ];
+          readonly DecisionType: readonly [
+            { readonly name: 'VOTE'; readonly value: 'VOTE' },
+            { readonly name: 'RANDOM'; readonly value: 'RANDOM' },
+            { readonly name: 'BEST_FIT'; readonly value: 'BEST_FIT' },
+          ];
+          readonly GroupModel: readonly [
+            { readonly name: 'SUGGESTION'; readonly value: 'SUGGESTION' },
+            { readonly name: 'PREFERENCE'; readonly value: 'PREFERENCE' },
+          ];
+          readonly GroupStatus: readonly [
+            { readonly name: 'LOBBY'; readonly value: 'LOBBY' },
+            { readonly name: 'COLLECTING'; readonly value: 'COLLECTING' },
+            { readonly name: 'DECIDING'; readonly value: 'DECIDING' },
+            { readonly name: 'TIE_BREAK'; readonly value: 'TIE_BREAK' },
+            { readonly name: 'COMPLETE'; readonly value: 'COMPLETE' },
+          ];
+          readonly ResultMethod: readonly [
+            { readonly name: 'VOTE'; readonly value: 'VOTE' },
+            { readonly name: 'RANDOM'; readonly value: 'RANDOM' },
+            { readonly name: 'BEST_FIT'; readonly value: 'BEST_FIT' },
+            { readonly name: 'TIE_RANDOM'; readonly value: 'TIE_RANDOM' },
+          ];
+          readonly RoundStatus: readonly [
+            { readonly name: 'OPEN'; readonly value: 'OPEN' },
+            { readonly name: 'CLOSED'; readonly value: 'CLOSED' },
+          ];
         };
       };
     };
@@ -603,11 +1814,18 @@ type ContractBase = Omit<
     readonly mutations: {
       readonly defaults: readonly [
         {
-          readonly onCreate: { readonly id: 'timestamptzStringNow'; readonly kind: 'generator' };
-          readonly onUpdate: { readonly id: 'timestamptzStringNow'; readonly kind: 'generator' };
+          readonly onCreate: { readonly id: 'uuidv4'; readonly kind: 'generator' };
           readonly ref: {
-            readonly entry: 'Post';
-            readonly field: 'updatedAt';
+            readonly entry: 'Candidate';
+            readonly field: 'id';
+            readonly namespace: 'public';
+          };
+        },
+        {
+          readonly onCreate: { readonly id: 'uuidv4'; readonly kind: 'generator' };
+          readonly ref: {
+            readonly entry: 'Group';
+            readonly field: 'id';
             readonly namespace: 'public';
           };
         },
@@ -615,8 +1833,48 @@ type ContractBase = Omit<
           readonly onCreate: { readonly id: 'timestamptzStringNow'; readonly kind: 'generator' };
           readonly onUpdate: { readonly id: 'timestamptzStringNow'; readonly kind: 'generator' };
           readonly ref: {
-            readonly entry: 'User';
+            readonly entry: 'Group';
             readonly field: 'updatedAt';
+            readonly namespace: 'public';
+          };
+        },
+        {
+          readonly onCreate: { readonly id: 'uuidv4'; readonly kind: 'generator' };
+          readonly ref: {
+            readonly entry: 'Member';
+            readonly field: 'id';
+            readonly namespace: 'public';
+          };
+        },
+        {
+          readonly onCreate: { readonly id: 'uuidv4'; readonly kind: 'generator' };
+          readonly ref: {
+            readonly entry: 'Preference';
+            readonly field: 'id';
+            readonly namespace: 'public';
+          };
+        },
+        {
+          readonly onCreate: { readonly id: 'uuidv4'; readonly kind: 'generator' };
+          readonly ref: {
+            readonly entry: 'Result';
+            readonly field: 'id';
+            readonly namespace: 'public';
+          };
+        },
+        {
+          readonly onCreate: { readonly id: 'uuidv4'; readonly kind: 'generator' };
+          readonly ref: {
+            readonly entry: 'Round';
+            readonly field: 'id';
+            readonly namespace: 'public';
+          };
+        },
+        {
+          readonly onCreate: { readonly id: 'uuidv4'; readonly kind: 'generator' };
+          readonly ref: {
+            readonly entry: 'Vote';
+            readonly field: 'id';
             readonly namespace: 'public';
           };
         },
