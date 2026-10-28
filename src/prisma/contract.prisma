@@ -1,21 +1,155 @@
 // use prisma-8
 
-model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  username  String?
-  name      String?
-  posts     Post[]
-  createdAt TimestamptzString @default(now())
-  updatedAt temporal.updatedAtString()
+enum GroupStatus {
+  @@type("pg/text@1")
+  LOBBY
+  COLLECTING
+  DECIDING
+  TIE_BREAK
+  COMPLETE
 }
 
-model Post {
-  id        Int      @id @default(autoincrement())
-  title     String
-  content   String?
-  author    User     @relation(fields: [authorId], references: [id])
-  authorId  Int
+enum GroupModel {
+  @@type("pg/text@1")
+  SUGGESTION
+  PREFERENCE
+}
+
+enum DecisionType {
+  @@type("pg/text@1")
+  VOTE
+  RANDOM
+  BEST_FIT
+}
+
+enum CandidateSource {
+  @@type("pg/text@1")
+  YELP
+  USER_SUGGESTED
+}
+
+enum RoundStatus {
+  @@type("pg/text@1")
+  OPEN
+  CLOSED
+}
+
+enum ResultMethod {
+  @@type("pg/text@1")
+  VOTE
+  RANDOM
+  BEST_FIT
+  TIE_RANDOM
+}
+
+model Group {
+  id           String            @id @onCreate(uuid())
+  inviteCode   String            @unique
+  status       GroupStatus       @default(LOBBY)
+  model        GroupModel?
+  decisionType DecisionType?
+  createdAt    TimestamptzString @default(now())
+  updatedAt    temporal.updatedAtString()
+
+  members      Member[]
+  candidates   Candidate[]
+  rounds       Round[]
+  result       Result?
+}
+
+model Member {
+  id               String            @id @onCreate(uuid())
+  groupId          String
+  displayName      String
+  isHost           Boolean           @default(false)
+  sessionTokenHash String            @unique
+  createdAt        TimestamptzString @default(now())
+
+  group       Group       @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  preference  Preference?
+  suggestions Candidate[]
+  votes       Vote[]
+
+  @@unique([groupId, displayName])
+  @@index([groupId])
+}
+
+model Preference {
+  id                  String  @id @onCreate(uuid())
+  memberId            String  @unique
+  cuisines            Json?
+  dietaryRestrictions Json?
+  priceLevels         Json?
+  maxDistanceMeters   Int?
+
+  member Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+}
+
+model Candidate {
+  id                 String            @id @onCreate(uuid())
+  groupId            String
+  source             CandidateSource
+  yelpBusinessId     String?
+  suggestedByMemberId String?
+  snapshot           Json
+  rank               Int?
+  createdAt          TimestamptzString @default(now())
+
+  group        Group            @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  suggestedBy  Member?          @relation(fields: [suggestedByMemberId], references: [id], onDelete: SetNull)
+  roundEntries RoundCandidate[]
+  votes        Vote[]
+  results      Result[]
+
+  @@index([groupId])
+}
+
+model Round {
+  id        String            @id @onCreate(uuid())
+  groupId   String
+  number    Int
+  status    RoundStatus       @default(OPEN)
   createdAt TimestamptzString @default(now())
-  updatedAt temporal.updatedAtString()
+
+  group      Group            @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  candidates RoundCandidate[]
+  votes      Vote[]
+
+  @@unique([groupId, number])
+}
+
+model RoundCandidate {
+  roundId     String
+  candidateId String
+
+  round     Round     @relation(fields: [roundId], references: [id], onDelete: Cascade)
+  candidate Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+
+  @@id([roundId, candidateId])
+}
+
+model Vote {
+  id          String            @id @onCreate(uuid())
+  roundId     String
+  memberId    String
+  candidateId String
+  createdAt   TimestamptzString @default(now())
+
+  round     Round     @relation(fields: [roundId], references: [id], onDelete: Cascade)
+  member    Member    @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  candidate Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+
+  @@unique([roundId, memberId])
+  @@index([roundId])
+}
+
+model Result {
+  id          String            @id @onCreate(uuid())
+  groupId     String            @unique
+  candidateId String
+  method      ResultMethod
+  chosenAt    TimestamptzString @default(now())
+
+  group     Group     @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  candidate Candidate @relation(fields: [candidateId], references: [id])
 }
