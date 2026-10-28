@@ -349,13 +349,6 @@
                   "kind": "scalar"
                 }
               },
-              "inviteCode": {
-                "nullable": false,
-                "type": {
-                  "codecId": "pg/text@1",
-                  "kind": "scalar"
-                }
-              },
               "model": {
                 "nullable": true,
                 "type": {
@@ -367,6 +360,13 @@
                   "entityName": "GroupModel",
                   "namespaceId": "public",
                   "plane": "domain"
+                }
+              },
+              "password": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
                 }
               },
               "status": {
@@ -464,11 +464,11 @@
                 "id": {
                   "column": "id"
                 },
-                "inviteCode": {
-                  "column": "inviteCode"
-                },
                 "model": {
                   "column": "model"
+                },
+                "password": {
+                  "column": "password"
                 },
                 "status": {
                   "column": "status"
@@ -1271,11 +1271,6 @@
                   "dataType": "pg/text",
                   "nullable": false
                 },
-                "inviteCode": {
-                  "codecId": "pg/text@1",
-                  "dataType": "pg/text",
-                  "nullable": false
-                },
                 "model": {
                   "codecId": "pg/text@1",
                   "dataType": "pg/text",
@@ -1286,6 +1281,11 @@
                     "namespaceId": "public",
                     "plane": "storage"
                   }
+                },
+                "password": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false
                 },
                 "status": {
                   "codecId": "pg/text@1",
@@ -1318,7 +1318,7 @@
               "uniques": [
                 {
                   "columns": [
-                    "inviteCode"
+                    "password"
                   ]
                 }
               ]
@@ -1963,7 +1963,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "2f42c64ad5eb05b8a74344ba0f014099fabdf58a6d7b18eb001d76fb11dc86c7"
+    "storageHash": "4b81b4a7171b8d1a74b0275e49cc6173a8bd9514f79014218f2fc18b85539456"
   },
   "execution": {
     "executionHash": "50f1e3d96e8f399abab3928ebd21e63f5812801b5224fe7b48a9c39b98c35304",

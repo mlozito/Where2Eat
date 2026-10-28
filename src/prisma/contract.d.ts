@@ -23,7 +23,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'2f42c64ad5eb05b8a74344ba0f014099fabdf58a6d7b18eb001d76fb11dc86c7'>;
+  StorageHashBase<'4b81b4a7171b8d1a74b0275e49cc6173a8bd9514f79014218f2fc18b85539456'>;
 export type ExecutionHash =
   ExecutionHashBase<'50f1e3d96e8f399abab3928ebd21e63f5812801b5224fe7b48a9c39b98c35304'>;
 export type ProfileHash =
@@ -356,8 +356,8 @@ export namespace Models {
     createdAt: FieldOutputTypes['public']['Group']['createdAt'];
     decisionType: FieldOutputTypes['public']['Group']['decisionType'];
     id: FieldOutputTypes['public']['Group']['id'];
-    inviteCode: FieldOutputTypes['public']['Group']['inviteCode'];
     model: FieldOutputTypes['public']['Group']['model'];
+    password: FieldOutputTypes['public']['Group']['password'];
     status: FieldOutputTypes['public']['Group']['status'];
     updatedAt: FieldOutputTypes['public']['Group']['updatedAt'];
     candidates: public_Candidate[];
@@ -577,16 +577,16 @@ type ContractBase = Omit<
                   readonly nullable: false;
                   readonly many: false;
                 };
-                readonly inviteCode: {
-                  readonly dataType: 'pg/text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
-                  readonly many: false;
-                };
                 readonly model: {
                   readonly dataType: 'pg/text';
                   readonly codecId: 'pg/text@1';
                   readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly password: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
                   readonly many: false;
                 };
                 readonly status: {
@@ -607,7 +607,7 @@ type ContractBase = Omit<
                 };
               };
               primaryKey: { readonly columns: readonly ['id'] };
-              uniques: readonly [{ readonly columns: readonly ['inviteCode'] }];
+              uniques: readonly [{ readonly columns: readonly ['password'] }];
               indexes: readonly [];
               foreignKeys: readonly [];
             };
@@ -1215,12 +1215,12 @@ type ContractBase = Omit<
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
-              readonly inviteCode: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
               readonly model: {
                 readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly password: {
+                readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
               readonly status: {
@@ -1289,8 +1289,8 @@ type ContractBase = Omit<
                 readonly createdAt: { readonly column: 'createdAt' };
                 readonly decisionType: { readonly column: 'decisionType' };
                 readonly id: { readonly column: 'id' };
-                readonly inviteCode: { readonly column: 'inviteCode' };
                 readonly model: { readonly column: 'model' };
+                readonly password: { readonly column: 'password' };
                 readonly status: { readonly column: 'status' };
                 readonly updatedAt: { readonly column: 'updatedAt' };
               };
