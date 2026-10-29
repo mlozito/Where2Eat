@@ -23,7 +23,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'2f42c64ad5eb05b8a74344ba0f014099fabdf58a6d7b18eb001d76fb11dc86c7'>;
+  StorageHashBase<'1b9fa98a270c16300982e9bf13e9795385b51b253b67ecac94f716b2f99a6974'>;
 export type ExecutionHash =
   ExecutionHashBase<'50f1e3d96e8f399abab3928ebd21e63f5812801b5224fe7b48a9c39b98c35304'>;
 export type ProfileHash =
@@ -357,6 +357,7 @@ export namespace Models {
     decisionType: FieldOutputTypes['public']['Group']['decisionType'];
     id: FieldOutputTypes['public']['Group']['id'];
     inviteCode: FieldOutputTypes['public']['Group']['inviteCode'];
+    location: FieldOutputTypes['public']['Group']['location'];
     model: FieldOutputTypes['public']['Group']['model'];
     status: FieldOutputTypes['public']['Group']['status'];
     updatedAt: FieldOutputTypes['public']['Group']['updatedAt'];
@@ -581,6 +582,12 @@ type ContractBase = Omit<
                   readonly dataType: 'pg/text';
                   readonly codecId: 'pg/text@1';
                   readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly location: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
                   readonly many: false;
                 };
                 readonly model: {
@@ -1219,6 +1226,10 @@ type ContractBase = Omit<
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
+              readonly location: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
               readonly model: {
                 readonly nullable: true;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
@@ -1290,6 +1301,7 @@ type ContractBase = Omit<
                 readonly decisionType: { readonly column: 'decisionType' };
                 readonly id: { readonly column: 'id' };
                 readonly inviteCode: { readonly column: 'inviteCode' };
+                readonly location: { readonly column: 'location' };
                 readonly model: { readonly column: 'model' };
                 readonly status: { readonly column: 'status' };
                 readonly updatedAt: { readonly column: 'updatedAt' };

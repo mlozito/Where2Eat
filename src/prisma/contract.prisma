@@ -48,6 +48,7 @@ model Group {
   status       GroupStatus       @default(LOBBY)
   model        GroupModel?
   decisionType DecisionType?
+  location     String?
   createdAt    TimestamptzString @default(now())
   updatedAt    temporal.updatedAtString()
 

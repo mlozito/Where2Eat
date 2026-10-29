@@ -356,6 +356,13 @@
                   "kind": "scalar"
                 }
               },
+              "location": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
               "model": {
                 "nullable": true,
                 "type": {
@@ -466,6 +473,9 @@
                 },
                 "inviteCode": {
                   "column": "inviteCode"
+                },
+                "location": {
+                  "column": "location"
                 },
                 "model": {
                   "column": "model"
@@ -1276,6 +1286,11 @@
                   "dataType": "pg/text",
                   "nullable": false
                 },
+                "location": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": true
+                },
                 "model": {
                   "codecId": "pg/text@1",
                   "dataType": "pg/text",
@@ -1963,7 +1978,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "2f42c64ad5eb05b8a74344ba0f014099fabdf58a6d7b18eb001d76fb11dc86c7"
+    "storageHash": "1b9fa98a270c16300982e9bf13e9795385b51b253b67ecac94f716b2f99a6974"
   },
   "execution": {
     "executionHash": "50f1e3d96e8f399abab3928ebd21e63f5812801b5224fe7b48a9c39b98c35304",
