@@ -123,7 +123,7 @@ export default function PreferencesPage() {
     );
 
     setMessage("Preferences saved successfully!");
-    router.push("/suggest");
+    router.push("/restaurant_search");
   }
 
   return (

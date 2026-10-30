@@ -35,12 +35,12 @@ export default function WaitingPage() {
       <main className="min-h-screen bg-orange-50 px-4 py-10 text-stone-900">
         <div className="mx-auto max-w-3xl rounded-2xl bg-white p-10 text-center shadow-sm">
           <h1 className="mb-3 text-2xl font-semibold">You&apos;re not in a group yet</h1>
-          <p className="mb-6 text-stone-600">Suggest a restaurant to get started.</p>
+          <p className="mb-6 text-stone-600">Start from the preferences page.</p>
           <Link
-            href="/suggest"
+            href="/preferences"
             className="inline-block rounded-xl bg-orange-600 px-6 py-3 font-semibold text-white hover:bg-orange-700"
           >
-            Suggest a Restaurant
+            Set Preferences
           </Link>
         </div>
       </main>

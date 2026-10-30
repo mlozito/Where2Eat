@@ -26,10 +26,10 @@ export default function VotePage() {
           <h1 className="mb-3 text-2xl font-semibold">Voting isn&apos;t open</h1>
           <p className="mb-6 text-stone-600">The host hasn&apos;t started a vote.</p>
           <Link
-            href={group ? "/waiting" : "/suggest"}
+            href={group ? "/waiting" : "/preferences"}
             className="inline-block rounded-xl bg-orange-600 px-6 py-3 font-semibold text-white hover:bg-orange-700"
           >
-            {group ? "Back to the waiting room" : "Suggest a Restaurant"}
+            {group ? "Back to the waiting room" : "Set Preferences"}
           </Link>
         </div>
       </main>
