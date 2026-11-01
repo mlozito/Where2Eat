@@ -30,6 +30,7 @@
     "prisma": "^8.0.0-rc.28",
     "supabase": "^2.122.0",
     "tailwindcss": "^4",
+    "tsx": "^4.23.15",
     "typescript": "^5"
   }
 }

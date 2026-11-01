@@ -45,7 +45,7 @@ enum ResultMethod {
 model Group {
   id           String            @id @onCreate(uuid())
   // password must be unique so we don't have to check against the whole database manually
-  password     String            @unique
+  joinCode     String            
   status       GroupStatus       @default(LOBBY)
   model        GroupModel?
   decisionType DecisionType?
