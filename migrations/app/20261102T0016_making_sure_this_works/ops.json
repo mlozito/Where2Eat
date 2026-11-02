@@ -1,0 +1,1924 @@
+[
+  {
+    "id": "dropTable.Post",
+    "label": "Drop table \"Post\"",
+    "operationClass": "destructive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "Post"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"Post\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Post\""
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "table \"Post\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop table \"Post\"",
+        "sql": "DROP TABLE \"public\".\"Post\""
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"Post\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Post\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "table \"Post\""
+        }
+      }
+    ]
+  },
+  {
+    "id": "dropTable.User",
+    "label": "Drop table \"User\"",
+    "operationClass": "destructive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "User"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"User\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"User\""
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "table \"User\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop table \"User\"",
+        "sql": "DROP TABLE \"public\".\"User\""
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"User\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"User\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "table \"User\""
+        }
+      }
+    ]
+  },
+  {
+    "id": "table.Candidate",
+    "label": "Create table \"Candidate\"",
+    "summary": "Creates table \"Candidate\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "Candidate"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"Candidate\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Candidate\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "table \"Candidate\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"Candidate\"",
+        "sql": "CREATE TABLE \"public\".\"Candidate\" (\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"groupId\" text NOT NULL,\n  \"id\" text NOT NULL,\n  \"rank\" int4,\n  \"snapshot\" json NOT NULL,\n  \"source\" text NOT NULL,\n  \"suggestedByMemberId\" text,\n  \"yelpBusinessId\" text,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"Candidate_source_check_838ca6e8\" CHECK (\"source\" IN ('YELP', 'USER_SUGGESTED'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"Candidate\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_class\" AS \"c\" WHERE (\"c\".\"oid\" = to_regclass($1) AND (\"c\".\"relkind\" = $2 OR \"c\".\"relkind\" = $3))) AS \"result\"",
+        "params": [
+          "\"public\".\"Candidate\"",
+          "r",
+          "p"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "table \"Candidate\""
+        }
+      }
+    ]
+  },
+  {
+    "id": "table.Group",
+    "label": "Create table \"Group\"",
+    "summary": "Creates table \"Group\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "Group"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"Group\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Group\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "table \"Group\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"Group\"",
+        "sql": "CREATE TABLE \"public\".\"Group\" (\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"decisionType\" text,\n  \"id\" text NOT NULL,\n  \"inviteCode\" text NOT NULL,\n  \"location\" text,\n  \"model\" text,\n  \"status\" text DEFAULT 'LOBBY' NOT NULL,\n  \"updatedAt\" timestamptz NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"Group_decisionType_check_d22c67fc\" CHECK (\"decisionType\" IN ('VOTE', 'RANDOM', 'BEST_FIT')),\n  CONSTRAINT \"Group_model_check_62a39fcd\" CHECK (\"model\" IN ('SUGGESTION', 'PREFERENCE')),\n  CONSTRAINT \"Group_status_check_8b0fd461\" CHECK (\"status\" IN ('LOBBY', 'COLLECTING', 'DECIDING', 'TIE_BREAK', 'COMPLETE'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"Group\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_class\" AS \"c\" WHERE (\"c\".\"oid\" = to_regclass($1) AND (\"c\".\"relkind\" = $2 OR \"c\".\"relkind\" = $3))) AS \"result\"",
+        "params": [
+          "\"public\".\"Group\"",
+          "r",
+          "p"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "table \"Group\""
+        }
+      }
+    ]
+  },
+  {
+    "id": "table.Member",
+    "label": "Create table \"Member\"",
+    "summary": "Creates table \"Member\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "Member"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"Member\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Member\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "table \"Member\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"Member\"",
+        "sql": "CREATE TABLE \"public\".\"Member\" (\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"displayName\" text NOT NULL,\n  \"groupId\" text NOT NULL,\n  \"id\" text NOT NULL,\n  \"isHost\" bool DEFAULT false NOT NULL,\n  \"sessionTokenHash\" text NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"Member\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_class\" AS \"c\" WHERE (\"c\".\"oid\" = to_regclass($1) AND (\"c\".\"relkind\" = $2 OR \"c\".\"relkind\" = $3))) AS \"result\"",
+        "params": [
+          "\"public\".\"Member\"",
+          "r",
+          "p"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "table \"Member\""
+        }
+      }
+    ]
+  },
+  {
+    "id": "table.Preference",
+    "label": "Create table \"Preference\"",
+    "summary": "Creates table \"Preference\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "Preference"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"Preference\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Preference\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "table \"Preference\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"Preference\"",
+        "sql": "CREATE TABLE \"public\".\"Preference\" (\n  \"cuisines\" json,\n  \"dietaryRestrictions\" json,\n  \"id\" text NOT NULL,\n  \"maxDistanceMeters\" int4,\n  \"memberId\" text NOT NULL,\n  \"priceLevels\" json,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"Preference\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_class\" AS \"c\" WHERE (\"c\".\"oid\" = to_regclass($1) AND (\"c\".\"relkind\" = $2 OR \"c\".\"relkind\" = $3))) AS \"result\"",
+        "params": [
+          "\"public\".\"Preference\"",
+          "r",
+          "p"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "table \"Preference\""
+        }
+      }
+    ]
+  },
+  {
+    "id": "table.Result",
+    "label": "Create table \"Result\"",
+    "summary": "Creates table \"Result\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "Result"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"Result\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Result\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "table \"Result\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"Result\"",
+        "sql": "CREATE TABLE \"public\".\"Result\" (\n  \"candidateId\" text NOT NULL,\n  \"chosenAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"groupId\" text NOT NULL,\n  \"id\" text NOT NULL,\n  \"method\" text NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"Result_method_check_0d01645a\" CHECK (\"method\" IN ('VOTE', 'RANDOM', 'BEST_FIT', 'TIE_RANDOM'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"Result\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_class\" AS \"c\" WHERE (\"c\".\"oid\" = to_regclass($1) AND (\"c\".\"relkind\" = $2 OR \"c\".\"relkind\" = $3))) AS \"result\"",
+        "params": [
+          "\"public\".\"Result\"",
+          "r",
+          "p"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "table \"Result\""
+        }
+      }
+    ]
+  },
+  {
+    "id": "table.Round",
+    "label": "Create table \"Round\"",
+    "summary": "Creates table \"Round\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "Round"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"Round\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Round\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "table \"Round\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"Round\"",
+        "sql": "CREATE TABLE \"public\".\"Round\" (\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"groupId\" text NOT NULL,\n  \"id\" text NOT NULL,\n  \"number\" int4 NOT NULL,\n  \"status\" text DEFAULT 'OPEN' NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"Round_status_check_32214e16\" CHECK (\"status\" IN ('OPEN', 'CLOSED'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"Round\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_class\" AS \"c\" WHERE (\"c\".\"oid\" = to_regclass($1) AND (\"c\".\"relkind\" = $2 OR \"c\".\"relkind\" = $3))) AS \"result\"",
+        "params": [
+          "\"public\".\"Round\"",
+          "r",
+          "p"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "table \"Round\""
+        }
+      }
+    ]
+  },
+  {
+    "id": "table.RoundCandidate",
+    "label": "Create table \"RoundCandidate\"",
+    "summary": "Creates table \"RoundCandidate\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "RoundCandidate"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"RoundCandidate\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"RoundCandidate\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "table \"RoundCandidate\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"RoundCandidate\"",
+        "sql": "CREATE TABLE \"public\".\"RoundCandidate\" (\n  \"candidateId\" text NOT NULL,\n  \"roundId\" text NOT NULL,\n  PRIMARY KEY (\"roundId\", \"candidateId\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"RoundCandidate\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_class\" AS \"c\" WHERE (\"c\".\"oid\" = to_regclass($1) AND (\"c\".\"relkind\" = $2 OR \"c\".\"relkind\" = $3))) AS \"result\"",
+        "params": [
+          "\"public\".\"RoundCandidate\"",
+          "r",
+          "p"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "table \"RoundCandidate\""
+        }
+      }
+    ]
+  },
+  {
+    "id": "table.Vote",
+    "label": "Create table \"Vote\"",
+    "summary": "Creates table \"Vote\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "Vote"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"Vote\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Vote\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "table \"Vote\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"Vote\"",
+        "sql": "CREATE TABLE \"public\".\"Vote\" (\n  \"candidateId\" text NOT NULL,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"id\" text NOT NULL,\n  \"memberId\" text NOT NULL,\n  \"roundId\" text NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"Vote\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_class\" AS \"c\" WHERE (\"c\".\"oid\" = to_regclass($1) AND (\"c\".\"relkind\" = $2 OR \"c\".\"relkind\" = $3))) AS \"result\"",
+        "params": [
+          "\"public\".\"Vote\"",
+          "r",
+          "p"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "table \"Vote\""
+        }
+      }
+    ]
+  },
+  {
+    "id": "unique.Group.Group_inviteCode_key",
+    "label": "Add unique constraint on \"Group\" (inviteCode)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "Group_inviteCode_key",
+        "table": "Group"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"Group_inviteCode_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Group_inviteCode_key",
+          "public",
+          "\"public\".\"Group\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "constraint \"Group_inviteCode_key\" on \"Group\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"Group_inviteCode_key\"",
+        "sql": "ALTER TABLE \"public\".\"Group\" ADD CONSTRAINT \"Group_inviteCode_key\" UNIQUE (\"inviteCode\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify unique constraint \"Group_inviteCode_key\" exists on (inviteCode)",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3) AND \"c\".\"contype\" = $4 AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"conkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"conrelid\" AND key_attribute.attnum = key_column.attnum) = ($5)::jsonb)) AS \"result\"",
+        "params": [
+          "Group_inviteCode_key",
+          "public",
+          "\"public\".\"Group\"",
+          "u",
+          "[\"inviteCode\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.Member.Member_sessionTokenHash_key",
+    "label": "Add unique constraint on \"Member\" (sessionTokenHash)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "Member_sessionTokenHash_key",
+        "table": "Member"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"Member_sessionTokenHash_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Member_sessionTokenHash_key",
+          "public",
+          "\"public\".\"Member\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "constraint \"Member_sessionTokenHash_key\" on \"Member\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"Member_sessionTokenHash_key\"",
+        "sql": "ALTER TABLE \"public\".\"Member\" ADD CONSTRAINT \"Member_sessionTokenHash_key\" UNIQUE (\"sessionTokenHash\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify unique constraint \"Member_sessionTokenHash_key\" exists on (sessionTokenHash)",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3) AND \"c\".\"contype\" = $4 AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"conkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"conrelid\" AND key_attribute.attnum = key_column.attnum) = ($5)::jsonb)) AS \"result\"",
+        "params": [
+          "Member_sessionTokenHash_key",
+          "public",
+          "\"public\".\"Member\"",
+          "u",
+          "[\"sessionTokenHash\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.Member.Member_groupId_displayName_key",
+    "label": "Add unique constraint on \"Member\" (groupId, displayName)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "Member_groupId_displayName_key",
+        "table": "Member"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"Member_groupId_displayName_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Member_groupId_displayName_key",
+          "public",
+          "\"public\".\"Member\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "constraint \"Member_groupId_displayName_key\" on \"Member\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"Member_groupId_displayName_key\"",
+        "sql": "ALTER TABLE \"public\".\"Member\" ADD CONSTRAINT \"Member_groupId_displayName_key\" UNIQUE (\"groupId\", \"displayName\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify unique constraint \"Member_groupId_displayName_key\" exists on (groupId, displayName)",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3) AND \"c\".\"contype\" = $4 AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"conkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"conrelid\" AND key_attribute.attnum = key_column.attnum) = ($5)::jsonb)) AS \"result\"",
+        "params": [
+          "Member_groupId_displayName_key",
+          "public",
+          "\"public\".\"Member\"",
+          "u",
+          "[\"groupId\",\"displayName\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.Preference.Preference_memberId_key",
+    "label": "Add unique constraint on \"Preference\" (memberId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "Preference_memberId_key",
+        "table": "Preference"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"Preference_memberId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Preference_memberId_key",
+          "public",
+          "\"public\".\"Preference\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "constraint \"Preference_memberId_key\" on \"Preference\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"Preference_memberId_key\"",
+        "sql": "ALTER TABLE \"public\".\"Preference\" ADD CONSTRAINT \"Preference_memberId_key\" UNIQUE (\"memberId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify unique constraint \"Preference_memberId_key\" exists on (memberId)",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3) AND \"c\".\"contype\" = $4 AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"conkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"conrelid\" AND key_attribute.attnum = key_column.attnum) = ($5)::jsonb)) AS \"result\"",
+        "params": [
+          "Preference_memberId_key",
+          "public",
+          "\"public\".\"Preference\"",
+          "u",
+          "[\"memberId\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.Result.Result_groupId_key",
+    "label": "Add unique constraint on \"Result\" (groupId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "Result_groupId_key",
+        "table": "Result"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"Result_groupId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Result_groupId_key",
+          "public",
+          "\"public\".\"Result\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "constraint \"Result_groupId_key\" on \"Result\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"Result_groupId_key\"",
+        "sql": "ALTER TABLE \"public\".\"Result\" ADD CONSTRAINT \"Result_groupId_key\" UNIQUE (\"groupId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify unique constraint \"Result_groupId_key\" exists on (groupId)",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3) AND \"c\".\"contype\" = $4 AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"conkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"conrelid\" AND key_attribute.attnum = key_column.attnum) = ($5)::jsonb)) AS \"result\"",
+        "params": [
+          "Result_groupId_key",
+          "public",
+          "\"public\".\"Result\"",
+          "u",
+          "[\"groupId\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.Round.Round_groupId_number_key",
+    "label": "Add unique constraint on \"Round\" (groupId, number)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "Round_groupId_number_key",
+        "table": "Round"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"Round_groupId_number_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Round_groupId_number_key",
+          "public",
+          "\"public\".\"Round\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "constraint \"Round_groupId_number_key\" on \"Round\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"Round_groupId_number_key\"",
+        "sql": "ALTER TABLE \"public\".\"Round\" ADD CONSTRAINT \"Round_groupId_number_key\" UNIQUE (\"groupId\", \"number\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify unique constraint \"Round_groupId_number_key\" exists on (groupId, number)",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3) AND \"c\".\"contype\" = $4 AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"conkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"conrelid\" AND key_attribute.attnum = key_column.attnum) = ($5)::jsonb)) AS \"result\"",
+        "params": [
+          "Round_groupId_number_key",
+          "public",
+          "\"public\".\"Round\"",
+          "u",
+          "[\"groupId\",\"number\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.Vote.Vote_roundId_memberId_key",
+    "label": "Add unique constraint on \"Vote\" (roundId, memberId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "Vote_roundId_memberId_key",
+        "table": "Vote"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"Vote_roundId_memberId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Vote_roundId_memberId_key",
+          "public",
+          "\"public\".\"Vote\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "constraint \"Vote_roundId_memberId_key\" on \"Vote\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"Vote_roundId_memberId_key\"",
+        "sql": "ALTER TABLE \"public\".\"Vote\" ADD CONSTRAINT \"Vote_roundId_memberId_key\" UNIQUE (\"roundId\", \"memberId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify unique constraint \"Vote_roundId_memberId_key\" exists on (roundId, memberId)",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3) AND \"c\".\"contype\" = $4 AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"conkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"conrelid\" AND key_attribute.attnum = key_column.attnum) = ($5)::jsonb)) AS \"result\"",
+        "params": [
+          "Vote_roundId_memberId_key",
+          "public",
+          "\"public\".\"Vote\"",
+          "u",
+          "[\"roundId\",\"memberId\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.Candidate.Candidate_groupId_idx_e2fb5578",
+    "label": "Create index \"Candidate_groupId_idx_e2fb5578\" on \"Candidate\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "Candidate_groupId_idx_e2fb5578",
+        "table": "Candidate"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"Candidate_groupId_idx_e2fb5578\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Candidate_groupId_idx_e2fb5578\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "index \"Candidate_groupId_idx_e2fb5578\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"Candidate_groupId_idx_e2fb5578\"",
+        "sql": "CREATE INDEX \"Candidate_groupId_idx_e2fb5578\" ON \"public\".\"Candidate\" (\"groupId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"Candidate_groupId_idx_e2fb5578\" exists on \"Candidate\" with the planned definition",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_class\" AS \"c\" INNER JOIN \"pg_index\" AS \"i\" ON \"i\".\"indexrelid\" = \"c\".\"oid\" INNER JOIN \"pg_am\" AS \"m\" ON \"m\".\"oid\" = \"c\".\"relam\" WHERE (\"c\".\"oid\" = to_regclass($1) AND (\"c\".\"relkind\" = $2 OR \"c\".\"relkind\" = $3) AND \"i\".\"indrelid\" = to_regclass($4) AND NOT (\"i\".\"indisunique\") AND \"m\".\"amname\" = $5 AND (\"i\".\"indexprs\" IS NULL AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"i\".\"indkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"i\".\"indrelid\" AND key_attribute.attnum = key_column.attnum) = ($6)::jsonb) AND \"i\".\"indpred\" IS NULL)) AS \"result\"",
+        "params": [
+          "\"public\".\"Candidate_groupId_idx_e2fb5578\"",
+          "i",
+          "I",
+          "\"public\".\"Candidate\"",
+          "btree",
+          "[\"groupId\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.Candidate.Candidate_suggestedByMemberId_idx_876a7f90",
+    "label": "Create index \"Candidate_suggestedByMemberId_idx_876a7f90\" on \"Candidate\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "Candidate_suggestedByMemberId_idx_876a7f90",
+        "table": "Candidate"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"Candidate_suggestedByMemberId_idx_876a7f90\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Candidate_suggestedByMemberId_idx_876a7f90\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "index \"Candidate_suggestedByMemberId_idx_876a7f90\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"Candidate_suggestedByMemberId_idx_876a7f90\"",
+        "sql": "CREATE INDEX \"Candidate_suggestedByMemberId_idx_876a7f90\" ON \"public\".\"Candidate\" (\"suggestedByMemberId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"Candidate_suggestedByMemberId_idx_876a7f90\" exists on \"Candidate\" with the planned definition",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_class\" AS \"c\" INNER JOIN \"pg_index\" AS \"i\" ON \"i\".\"indexrelid\" = \"c\".\"oid\" INNER JOIN \"pg_am\" AS \"m\" ON \"m\".\"oid\" = \"c\".\"relam\" WHERE (\"c\".\"oid\" = to_regclass($1) AND (\"c\".\"relkind\" = $2 OR \"c\".\"relkind\" = $3) AND \"i\".\"indrelid\" = to_regclass($4) AND NOT (\"i\".\"indisunique\") AND \"m\".\"amname\" = $5 AND (\"i\".\"indexprs\" IS NULL AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"i\".\"indkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"i\".\"indrelid\" AND key_attribute.attnum = key_column.attnum) = ($6)::jsonb) AND \"i\".\"indpred\" IS NULL)) AS \"result\"",
+        "params": [
+          "\"public\".\"Candidate_suggestedByMemberId_idx_876a7f90\"",
+          "i",
+          "I",
+          "\"public\".\"Candidate\"",
+          "btree",
+          "[\"suggestedByMemberId\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.Member.Member_groupId_idx_e2fb5578",
+    "label": "Create index \"Member_groupId_idx_e2fb5578\" on \"Member\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "Member_groupId_idx_e2fb5578",
+        "table": "Member"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"Member_groupId_idx_e2fb5578\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Member_groupId_idx_e2fb5578\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "index \"Member_groupId_idx_e2fb5578\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"Member_groupId_idx_e2fb5578\"",
+        "sql": "CREATE INDEX \"Member_groupId_idx_e2fb5578\" ON \"public\".\"Member\" (\"groupId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"Member_groupId_idx_e2fb5578\" exists on \"Member\" with the planned definition",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_class\" AS \"c\" INNER JOIN \"pg_index\" AS \"i\" ON \"i\".\"indexrelid\" = \"c\".\"oid\" INNER JOIN \"pg_am\" AS \"m\" ON \"m\".\"oid\" = \"c\".\"relam\" WHERE (\"c\".\"oid\" = to_regclass($1) AND (\"c\".\"relkind\" = $2 OR \"c\".\"relkind\" = $3) AND \"i\".\"indrelid\" = to_regclass($4) AND NOT (\"i\".\"indisunique\") AND \"m\".\"amname\" = $5 AND (\"i\".\"indexprs\" IS NULL AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"i\".\"indkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"i\".\"indrelid\" AND key_attribute.attnum = key_column.attnum) = ($6)::jsonb) AND \"i\".\"indpred\" IS NULL)) AS \"result\"",
+        "params": [
+          "\"public\".\"Member_groupId_idx_e2fb5578\"",
+          "i",
+          "I",
+          "\"public\".\"Member\"",
+          "btree",
+          "[\"groupId\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.Result.Result_candidateId_idx_462b5869",
+    "label": "Create index \"Result_candidateId_idx_462b5869\" on \"Result\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "Result_candidateId_idx_462b5869",
+        "table": "Result"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"Result_candidateId_idx_462b5869\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Result_candidateId_idx_462b5869\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "index \"Result_candidateId_idx_462b5869\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"Result_candidateId_idx_462b5869\"",
+        "sql": "CREATE INDEX \"Result_candidateId_idx_462b5869\" ON \"public\".\"Result\" (\"candidateId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"Result_candidateId_idx_462b5869\" exists on \"Result\" with the planned definition",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_class\" AS \"c\" INNER JOIN \"pg_index\" AS \"i\" ON \"i\".\"indexrelid\" = \"c\".\"oid\" INNER JOIN \"pg_am\" AS \"m\" ON \"m\".\"oid\" = \"c\".\"relam\" WHERE (\"c\".\"oid\" = to_regclass($1) AND (\"c\".\"relkind\" = $2 OR \"c\".\"relkind\" = $3) AND \"i\".\"indrelid\" = to_regclass($4) AND NOT (\"i\".\"indisunique\") AND \"m\".\"amname\" = $5 AND (\"i\".\"indexprs\" IS NULL AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"i\".\"indkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"i\".\"indrelid\" AND key_attribute.attnum = key_column.attnum) = ($6)::jsonb) AND \"i\".\"indpred\" IS NULL)) AS \"result\"",
+        "params": [
+          "\"public\".\"Result_candidateId_idx_462b5869\"",
+          "i",
+          "I",
+          "\"public\".\"Result\"",
+          "btree",
+          "[\"candidateId\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.Round.Round_groupId_idx_e2fb5578",
+    "label": "Create index \"Round_groupId_idx_e2fb5578\" on \"Round\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "Round_groupId_idx_e2fb5578",
+        "table": "Round"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"Round_groupId_idx_e2fb5578\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Round_groupId_idx_e2fb5578\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "index \"Round_groupId_idx_e2fb5578\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"Round_groupId_idx_e2fb5578\"",
+        "sql": "CREATE INDEX \"Round_groupId_idx_e2fb5578\" ON \"public\".\"Round\" (\"groupId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"Round_groupId_idx_e2fb5578\" exists on \"Round\" with the planned definition",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_class\" AS \"c\" INNER JOIN \"pg_index\" AS \"i\" ON \"i\".\"indexrelid\" = \"c\".\"oid\" INNER JOIN \"pg_am\" AS \"m\" ON \"m\".\"oid\" = \"c\".\"relam\" WHERE (\"c\".\"oid\" = to_regclass($1) AND (\"c\".\"relkind\" = $2 OR \"c\".\"relkind\" = $3) AND \"i\".\"indrelid\" = to_regclass($4) AND NOT (\"i\".\"indisunique\") AND \"m\".\"amname\" = $5 AND (\"i\".\"indexprs\" IS NULL AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"i\".\"indkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"i\".\"indrelid\" AND key_attribute.attnum = key_column.attnum) = ($6)::jsonb) AND \"i\".\"indpred\" IS NULL)) AS \"result\"",
+        "params": [
+          "\"public\".\"Round_groupId_idx_e2fb5578\"",
+          "i",
+          "I",
+          "\"public\".\"Round\"",
+          "btree",
+          "[\"groupId\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.RoundCandidate.RoundCandidate_candidateId_idx_462b5869",
+    "label": "Create index \"RoundCandidate_candidateId_idx_462b5869\" on \"RoundCandidate\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "RoundCandidate_candidateId_idx_462b5869",
+        "table": "RoundCandidate"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"RoundCandidate_candidateId_idx_462b5869\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"RoundCandidate_candidateId_idx_462b5869\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "index \"RoundCandidate_candidateId_idx_462b5869\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"RoundCandidate_candidateId_idx_462b5869\"",
+        "sql": "CREATE INDEX \"RoundCandidate_candidateId_idx_462b5869\" ON \"public\".\"RoundCandidate\" (\"candidateId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"RoundCandidate_candidateId_idx_462b5869\" exists on \"RoundCandidate\" with the planned definition",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_class\" AS \"c\" INNER JOIN \"pg_index\" AS \"i\" ON \"i\".\"indexrelid\" = \"c\".\"oid\" INNER JOIN \"pg_am\" AS \"m\" ON \"m\".\"oid\" = \"c\".\"relam\" WHERE (\"c\".\"oid\" = to_regclass($1) AND (\"c\".\"relkind\" = $2 OR \"c\".\"relkind\" = $3) AND \"i\".\"indrelid\" = to_regclass($4) AND NOT (\"i\".\"indisunique\") AND \"m\".\"amname\" = $5 AND (\"i\".\"indexprs\" IS NULL AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"i\".\"indkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"i\".\"indrelid\" AND key_attribute.attnum = key_column.attnum) = ($6)::jsonb) AND \"i\".\"indpred\" IS NULL)) AS \"result\"",
+        "params": [
+          "\"public\".\"RoundCandidate_candidateId_idx_462b5869\"",
+          "i",
+          "I",
+          "\"public\".\"RoundCandidate\"",
+          "btree",
+          "[\"candidateId\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.RoundCandidate.RoundCandidate_roundId_idx_b7564116",
+    "label": "Create index \"RoundCandidate_roundId_idx_b7564116\" on \"RoundCandidate\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "RoundCandidate_roundId_idx_b7564116",
+        "table": "RoundCandidate"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"RoundCandidate_roundId_idx_b7564116\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"RoundCandidate_roundId_idx_b7564116\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "index \"RoundCandidate_roundId_idx_b7564116\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"RoundCandidate_roundId_idx_b7564116\"",
+        "sql": "CREATE INDEX \"RoundCandidate_roundId_idx_b7564116\" ON \"public\".\"RoundCandidate\" (\"roundId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"RoundCandidate_roundId_idx_b7564116\" exists on \"RoundCandidate\" with the planned definition",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_class\" AS \"c\" INNER JOIN \"pg_index\" AS \"i\" ON \"i\".\"indexrelid\" = \"c\".\"oid\" INNER JOIN \"pg_am\" AS \"m\" ON \"m\".\"oid\" = \"c\".\"relam\" WHERE (\"c\".\"oid\" = to_regclass($1) AND (\"c\".\"relkind\" = $2 OR \"c\".\"relkind\" = $3) AND \"i\".\"indrelid\" = to_regclass($4) AND NOT (\"i\".\"indisunique\") AND \"m\".\"amname\" = $5 AND (\"i\".\"indexprs\" IS NULL AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"i\".\"indkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"i\".\"indrelid\" AND key_attribute.attnum = key_column.attnum) = ($6)::jsonb) AND \"i\".\"indpred\" IS NULL)) AS \"result\"",
+        "params": [
+          "\"public\".\"RoundCandidate_roundId_idx_b7564116\"",
+          "i",
+          "I",
+          "\"public\".\"RoundCandidate\"",
+          "btree",
+          "[\"roundId\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.Vote.Vote_candidateId_idx_462b5869",
+    "label": "Create index \"Vote_candidateId_idx_462b5869\" on \"Vote\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "Vote_candidateId_idx_462b5869",
+        "table": "Vote"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"Vote_candidateId_idx_462b5869\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Vote_candidateId_idx_462b5869\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "index \"Vote_candidateId_idx_462b5869\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"Vote_candidateId_idx_462b5869\"",
+        "sql": "CREATE INDEX \"Vote_candidateId_idx_462b5869\" ON \"public\".\"Vote\" (\"candidateId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"Vote_candidateId_idx_462b5869\" exists on \"Vote\" with the planned definition",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_class\" AS \"c\" INNER JOIN \"pg_index\" AS \"i\" ON \"i\".\"indexrelid\" = \"c\".\"oid\" INNER JOIN \"pg_am\" AS \"m\" ON \"m\".\"oid\" = \"c\".\"relam\" WHERE (\"c\".\"oid\" = to_regclass($1) AND (\"c\".\"relkind\" = $2 OR \"c\".\"relkind\" = $3) AND \"i\".\"indrelid\" = to_regclass($4) AND NOT (\"i\".\"indisunique\") AND \"m\".\"amname\" = $5 AND (\"i\".\"indexprs\" IS NULL AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"i\".\"indkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"i\".\"indrelid\" AND key_attribute.attnum = key_column.attnum) = ($6)::jsonb) AND \"i\".\"indpred\" IS NULL)) AS \"result\"",
+        "params": [
+          "\"public\".\"Vote_candidateId_idx_462b5869\"",
+          "i",
+          "I",
+          "\"public\".\"Vote\"",
+          "btree",
+          "[\"candidateId\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.Vote.Vote_memberId_idx_76b3c263",
+    "label": "Create index \"Vote_memberId_idx_76b3c263\" on \"Vote\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "Vote_memberId_idx_76b3c263",
+        "table": "Vote"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"Vote_memberId_idx_76b3c263\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Vote_memberId_idx_76b3c263\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "index \"Vote_memberId_idx_76b3c263\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"Vote_memberId_idx_76b3c263\"",
+        "sql": "CREATE INDEX \"Vote_memberId_idx_76b3c263\" ON \"public\".\"Vote\" (\"memberId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"Vote_memberId_idx_76b3c263\" exists on \"Vote\" with the planned definition",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_class\" AS \"c\" INNER JOIN \"pg_index\" AS \"i\" ON \"i\".\"indexrelid\" = \"c\".\"oid\" INNER JOIN \"pg_am\" AS \"m\" ON \"m\".\"oid\" = \"c\".\"relam\" WHERE (\"c\".\"oid\" = to_regclass($1) AND (\"c\".\"relkind\" = $2 OR \"c\".\"relkind\" = $3) AND \"i\".\"indrelid\" = to_regclass($4) AND NOT (\"i\".\"indisunique\") AND \"m\".\"amname\" = $5 AND (\"i\".\"indexprs\" IS NULL AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"i\".\"indkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"i\".\"indrelid\" AND key_attribute.attnum = key_column.attnum) = ($6)::jsonb) AND \"i\".\"indpred\" IS NULL)) AS \"result\"",
+        "params": [
+          "\"public\".\"Vote_memberId_idx_76b3c263\"",
+          "i",
+          "I",
+          "\"public\".\"Vote\"",
+          "btree",
+          "[\"memberId\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.Vote.Vote_roundId_idx_b7564116",
+    "label": "Create index \"Vote_roundId_idx_b7564116\" on \"Vote\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "Vote_roundId_idx_b7564116",
+        "table": "Vote"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"Vote_roundId_idx_b7564116\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Vote_roundId_idx_b7564116\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "index \"Vote_roundId_idx_b7564116\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"Vote_roundId_idx_b7564116\"",
+        "sql": "CREATE INDEX \"Vote_roundId_idx_b7564116\" ON \"public\".\"Vote\" (\"roundId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"Vote_roundId_idx_b7564116\" exists on \"Vote\" with the planned definition",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_class\" AS \"c\" INNER JOIN \"pg_index\" AS \"i\" ON \"i\".\"indexrelid\" = \"c\".\"oid\" INNER JOIN \"pg_am\" AS \"m\" ON \"m\".\"oid\" = \"c\".\"relam\" WHERE (\"c\".\"oid\" = to_regclass($1) AND (\"c\".\"relkind\" = $2 OR \"c\".\"relkind\" = $3) AND \"i\".\"indrelid\" = to_regclass($4) AND NOT (\"i\".\"indisunique\") AND \"m\".\"amname\" = $5 AND (\"i\".\"indexprs\" IS NULL AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"i\".\"indkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"i\".\"indrelid\" AND key_attribute.attnum = key_column.attnum) = ($6)::jsonb) AND \"i\".\"indpred\" IS NULL)) AS \"result\"",
+        "params": [
+          "\"public\".\"Vote_roundId_idx_b7564116\"",
+          "i",
+          "I",
+          "\"public\".\"Vote\"",
+          "btree",
+          "[\"roundId\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.Candidate.Candidate_groupId_fkey",
+    "label": "Add foreign key \"Candidate_groupId_fkey\" on \"Candidate\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "Candidate_groupId_fkey",
+        "table": "Candidate"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"Candidate_groupId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Candidate_groupId_fkey",
+          "public",
+          "\"public\".\"Candidate\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "FK \"Candidate_groupId_fkey\" on \"Candidate\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"Candidate_groupId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"Candidate\"\nADD CONSTRAINT \"Candidate_groupId_fkey\"\nFOREIGN KEY (\"groupId\")\nREFERENCES \"public\".\"Group\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"Candidate_groupId_fkey\" exists with the planned columns, referenced table and actions",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3) AND \"c\".\"contype\" = $4 AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"conkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"conrelid\" AND key_attribute.attnum = key_column.attnum) = ($5)::jsonb AND \"c\".\"confrelid\" = to_regclass($6) AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"confkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"confrelid\" AND key_attribute.attnum = key_column.attnum) = ($7)::jsonb AND \"c\".\"confdeltype\" = $8 AND \"c\".\"confupdtype\" = $9)) AS \"result\"",
+        "params": [
+          "Candidate_groupId_fkey",
+          "public",
+          "\"public\".\"Candidate\"",
+          "f",
+          "[\"groupId\"]",
+          "\"public\".\"Group\"",
+          "[\"id\"]",
+          "c",
+          "a"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.Candidate.Candidate_suggestedByMemberId_fkey",
+    "label": "Add foreign key \"Candidate_suggestedByMemberId_fkey\" on \"Candidate\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "Candidate_suggestedByMemberId_fkey",
+        "table": "Candidate"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"Candidate_suggestedByMemberId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Candidate_suggestedByMemberId_fkey",
+          "public",
+          "\"public\".\"Candidate\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "FK \"Candidate_suggestedByMemberId_fkey\" on \"Candidate\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"Candidate_suggestedByMemberId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"Candidate\"\nADD CONSTRAINT \"Candidate_suggestedByMemberId_fkey\"\nFOREIGN KEY (\"suggestedByMemberId\")\nREFERENCES \"public\".\"Member\" (\"id\")\nON DELETE SET NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"Candidate_suggestedByMemberId_fkey\" exists with the planned columns, referenced table and actions",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3) AND \"c\".\"contype\" = $4 AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"conkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"conrelid\" AND key_attribute.attnum = key_column.attnum) = ($5)::jsonb AND \"c\".\"confrelid\" = to_regclass($6) AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"confkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"confrelid\" AND key_attribute.attnum = key_column.attnum) = ($7)::jsonb AND \"c\".\"confdeltype\" = $8 AND \"c\".\"confupdtype\" = $9)) AS \"result\"",
+        "params": [
+          "Candidate_suggestedByMemberId_fkey",
+          "public",
+          "\"public\".\"Candidate\"",
+          "f",
+          "[\"suggestedByMemberId\"]",
+          "\"public\".\"Member\"",
+          "[\"id\"]",
+          "n",
+          "a"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.Member.Member_groupId_fkey",
+    "label": "Add foreign key \"Member_groupId_fkey\" on \"Member\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "Member_groupId_fkey",
+        "table": "Member"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"Member_groupId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Member_groupId_fkey",
+          "public",
+          "\"public\".\"Member\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "FK \"Member_groupId_fkey\" on \"Member\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"Member_groupId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"Member\"\nADD CONSTRAINT \"Member_groupId_fkey\"\nFOREIGN KEY (\"groupId\")\nREFERENCES \"public\".\"Group\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"Member_groupId_fkey\" exists with the planned columns, referenced table and actions",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3) AND \"c\".\"contype\" = $4 AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"conkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"conrelid\" AND key_attribute.attnum = key_column.attnum) = ($5)::jsonb AND \"c\".\"confrelid\" = to_regclass($6) AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"confkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"confrelid\" AND key_attribute.attnum = key_column.attnum) = ($7)::jsonb AND \"c\".\"confdeltype\" = $8 AND \"c\".\"confupdtype\" = $9)) AS \"result\"",
+        "params": [
+          "Member_groupId_fkey",
+          "public",
+          "\"public\".\"Member\"",
+          "f",
+          "[\"groupId\"]",
+          "\"public\".\"Group\"",
+          "[\"id\"]",
+          "c",
+          "a"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.Preference.Preference_memberId_fkey",
+    "label": "Add foreign key \"Preference_memberId_fkey\" on \"Preference\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "Preference_memberId_fkey",
+        "table": "Preference"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"Preference_memberId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Preference_memberId_fkey",
+          "public",
+          "\"public\".\"Preference\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "FK \"Preference_memberId_fkey\" on \"Preference\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"Preference_memberId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"Preference\"\nADD CONSTRAINT \"Preference_memberId_fkey\"\nFOREIGN KEY (\"memberId\")\nREFERENCES \"public\".\"Member\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"Preference_memberId_fkey\" exists with the planned columns, referenced table and actions",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3) AND \"c\".\"contype\" = $4 AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"conkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"conrelid\" AND key_attribute.attnum = key_column.attnum) = ($5)::jsonb AND \"c\".\"confrelid\" = to_regclass($6) AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"confkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"confrelid\" AND key_attribute.attnum = key_column.attnum) = ($7)::jsonb AND \"c\".\"confdeltype\" = $8 AND \"c\".\"confupdtype\" = $9)) AS \"result\"",
+        "params": [
+          "Preference_memberId_fkey",
+          "public",
+          "\"public\".\"Preference\"",
+          "f",
+          "[\"memberId\"]",
+          "\"public\".\"Member\"",
+          "[\"id\"]",
+          "c",
+          "a"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.Result.Result_groupId_fkey",
+    "label": "Add foreign key \"Result_groupId_fkey\" on \"Result\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "Result_groupId_fkey",
+        "table": "Result"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"Result_groupId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Result_groupId_fkey",
+          "public",
+          "\"public\".\"Result\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "FK \"Result_groupId_fkey\" on \"Result\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"Result_groupId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"Result\"\nADD CONSTRAINT \"Result_groupId_fkey\"\nFOREIGN KEY (\"groupId\")\nREFERENCES \"public\".\"Group\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"Result_groupId_fkey\" exists with the planned columns, referenced table and actions",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3) AND \"c\".\"contype\" = $4 AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"conkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"conrelid\" AND key_attribute.attnum = key_column.attnum) = ($5)::jsonb AND \"c\".\"confrelid\" = to_regclass($6) AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"confkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"confrelid\" AND key_attribute.attnum = key_column.attnum) = ($7)::jsonb AND \"c\".\"confdeltype\" = $8 AND \"c\".\"confupdtype\" = $9)) AS \"result\"",
+        "params": [
+          "Result_groupId_fkey",
+          "public",
+          "\"public\".\"Result\"",
+          "f",
+          "[\"groupId\"]",
+          "\"public\".\"Group\"",
+          "[\"id\"]",
+          "c",
+          "a"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.Result.Result_candidateId_fkey",
+    "label": "Add foreign key \"Result_candidateId_fkey\" on \"Result\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "Result_candidateId_fkey",
+        "table": "Result"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"Result_candidateId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Result_candidateId_fkey",
+          "public",
+          "\"public\".\"Result\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "FK \"Result_candidateId_fkey\" on \"Result\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"Result_candidateId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"Result\"\nADD CONSTRAINT \"Result_candidateId_fkey\"\nFOREIGN KEY (\"candidateId\")\nREFERENCES \"public\".\"Candidate\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"Result_candidateId_fkey\" exists with the planned columns, referenced table and actions",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3) AND \"c\".\"contype\" = $4 AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"conkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"conrelid\" AND key_attribute.attnum = key_column.attnum) = ($5)::jsonb AND \"c\".\"confrelid\" = to_regclass($6) AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"confkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"confrelid\" AND key_attribute.attnum = key_column.attnum) = ($7)::jsonb AND \"c\".\"confdeltype\" = $8 AND \"c\".\"confupdtype\" = $9)) AS \"result\"",
+        "params": [
+          "Result_candidateId_fkey",
+          "public",
+          "\"public\".\"Result\"",
+          "f",
+          "[\"candidateId\"]",
+          "\"public\".\"Candidate\"",
+          "[\"id\"]",
+          "a",
+          "a"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.Round.Round_groupId_fkey",
+    "label": "Add foreign key \"Round_groupId_fkey\" on \"Round\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "Round_groupId_fkey",
+        "table": "Round"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"Round_groupId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Round_groupId_fkey",
+          "public",
+          "\"public\".\"Round\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "FK \"Round_groupId_fkey\" on \"Round\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"Round_groupId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"Round\"\nADD CONSTRAINT \"Round_groupId_fkey\"\nFOREIGN KEY (\"groupId\")\nREFERENCES \"public\".\"Group\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"Round_groupId_fkey\" exists with the planned columns, referenced table and actions",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3) AND \"c\".\"contype\" = $4 AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"conkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"conrelid\" AND key_attribute.attnum = key_column.attnum) = ($5)::jsonb AND \"c\".\"confrelid\" = to_regclass($6) AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"confkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"confrelid\" AND key_attribute.attnum = key_column.attnum) = ($7)::jsonb AND \"c\".\"confdeltype\" = $8 AND \"c\".\"confupdtype\" = $9)) AS \"result\"",
+        "params": [
+          "Round_groupId_fkey",
+          "public",
+          "\"public\".\"Round\"",
+          "f",
+          "[\"groupId\"]",
+          "\"public\".\"Group\"",
+          "[\"id\"]",
+          "c",
+          "a"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.RoundCandidate.RoundCandidate_roundId_fkey",
+    "label": "Add foreign key \"RoundCandidate_roundId_fkey\" on \"RoundCandidate\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "RoundCandidate_roundId_fkey",
+        "table": "RoundCandidate"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"RoundCandidate_roundId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "RoundCandidate_roundId_fkey",
+          "public",
+          "\"public\".\"RoundCandidate\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "FK \"RoundCandidate_roundId_fkey\" on \"RoundCandidate\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"RoundCandidate_roundId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"RoundCandidate\"\nADD CONSTRAINT \"RoundCandidate_roundId_fkey\"\nFOREIGN KEY (\"roundId\")\nREFERENCES \"public\".\"Round\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"RoundCandidate_roundId_fkey\" exists with the planned columns, referenced table and actions",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3) AND \"c\".\"contype\" = $4 AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"conkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"conrelid\" AND key_attribute.attnum = key_column.attnum) = ($5)::jsonb AND \"c\".\"confrelid\" = to_regclass($6) AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"confkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"confrelid\" AND key_attribute.attnum = key_column.attnum) = ($7)::jsonb AND \"c\".\"confdeltype\" = $8 AND \"c\".\"confupdtype\" = $9)) AS \"result\"",
+        "params": [
+          "RoundCandidate_roundId_fkey",
+          "public",
+          "\"public\".\"RoundCandidate\"",
+          "f",
+          "[\"roundId\"]",
+          "\"public\".\"Round\"",
+          "[\"id\"]",
+          "c",
+          "a"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.RoundCandidate.RoundCandidate_candidateId_fkey",
+    "label": "Add foreign key \"RoundCandidate_candidateId_fkey\" on \"RoundCandidate\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "RoundCandidate_candidateId_fkey",
+        "table": "RoundCandidate"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"RoundCandidate_candidateId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "RoundCandidate_candidateId_fkey",
+          "public",
+          "\"public\".\"RoundCandidate\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "FK \"RoundCandidate_candidateId_fkey\" on \"RoundCandidate\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"RoundCandidate_candidateId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"RoundCandidate\"\nADD CONSTRAINT \"RoundCandidate_candidateId_fkey\"\nFOREIGN KEY (\"candidateId\")\nREFERENCES \"public\".\"Candidate\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"RoundCandidate_candidateId_fkey\" exists with the planned columns, referenced table and actions",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3) AND \"c\".\"contype\" = $4 AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"conkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"conrelid\" AND key_attribute.attnum = key_column.attnum) = ($5)::jsonb AND \"c\".\"confrelid\" = to_regclass($6) AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"confkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"confrelid\" AND key_attribute.attnum = key_column.attnum) = ($7)::jsonb AND \"c\".\"confdeltype\" = $8 AND \"c\".\"confupdtype\" = $9)) AS \"result\"",
+        "params": [
+          "RoundCandidate_candidateId_fkey",
+          "public",
+          "\"public\".\"RoundCandidate\"",
+          "f",
+          "[\"candidateId\"]",
+          "\"public\".\"Candidate\"",
+          "[\"id\"]",
+          "c",
+          "a"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.Vote.Vote_roundId_fkey",
+    "label": "Add foreign key \"Vote_roundId_fkey\" on \"Vote\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "Vote_roundId_fkey",
+        "table": "Vote"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"Vote_roundId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Vote_roundId_fkey",
+          "public",
+          "\"public\".\"Vote\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "FK \"Vote_roundId_fkey\" on \"Vote\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"Vote_roundId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"Vote\"\nADD CONSTRAINT \"Vote_roundId_fkey\"\nFOREIGN KEY (\"roundId\")\nREFERENCES \"public\".\"Round\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"Vote_roundId_fkey\" exists with the planned columns, referenced table and actions",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3) AND \"c\".\"contype\" = $4 AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"conkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"conrelid\" AND key_attribute.attnum = key_column.attnum) = ($5)::jsonb AND \"c\".\"confrelid\" = to_regclass($6) AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"confkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"confrelid\" AND key_attribute.attnum = key_column.attnum) = ($7)::jsonb AND \"c\".\"confdeltype\" = $8 AND \"c\".\"confupdtype\" = $9)) AS \"result\"",
+        "params": [
+          "Vote_roundId_fkey",
+          "public",
+          "\"public\".\"Vote\"",
+          "f",
+          "[\"roundId\"]",
+          "\"public\".\"Round\"",
+          "[\"id\"]",
+          "c",
+          "a"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.Vote.Vote_memberId_fkey",
+    "label": "Add foreign key \"Vote_memberId_fkey\" on \"Vote\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "Vote_memberId_fkey",
+        "table": "Vote"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"Vote_memberId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Vote_memberId_fkey",
+          "public",
+          "\"public\".\"Vote\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "FK \"Vote_memberId_fkey\" on \"Vote\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"Vote_memberId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"Vote\"\nADD CONSTRAINT \"Vote_memberId_fkey\"\nFOREIGN KEY (\"memberId\")\nREFERENCES \"public\".\"Member\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"Vote_memberId_fkey\" exists with the planned columns, referenced table and actions",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3) AND \"c\".\"contype\" = $4 AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"conkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"conrelid\" AND key_attribute.attnum = key_column.attnum) = ($5)::jsonb AND \"c\".\"confrelid\" = to_regclass($6) AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"confkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"confrelid\" AND key_attribute.attnum = key_column.attnum) = ($7)::jsonb AND \"c\".\"confdeltype\" = $8 AND \"c\".\"confupdtype\" = $9)) AS \"result\"",
+        "params": [
+          "Vote_memberId_fkey",
+          "public",
+          "\"public\".\"Vote\"",
+          "f",
+          "[\"memberId\"]",
+          "\"public\".\"Member\"",
+          "[\"id\"]",
+          "c",
+          "a"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.Vote.Vote_candidateId_fkey",
+    "label": "Add foreign key \"Vote_candidateId_fkey\" on \"Vote\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "Vote_candidateId_fkey",
+        "table": "Vote"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"Vote_candidateId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Vote_candidateId_fkey",
+          "public",
+          "\"public\".\"Vote\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "FK \"Vote_candidateId_fkey\" on \"Vote\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"Vote_candidateId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"Vote\"\nADD CONSTRAINT \"Vote_candidateId_fkey\"\nFOREIGN KEY (\"candidateId\")\nREFERENCES \"public\".\"Candidate\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"Vote_candidateId_fkey\" exists with the planned columns, referenced table and actions",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3) AND \"c\".\"contype\" = $4 AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"conkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"conrelid\" AND key_attribute.attnum = key_column.attnum) = ($5)::jsonb AND \"c\".\"confrelid\" = to_regclass($6) AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"confkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"confrelid\" AND key_attribute.attnum = key_column.attnum) = ($7)::jsonb AND \"c\".\"confdeltype\" = $8 AND \"c\".\"confupdtype\" = $9)) AS \"result\"",
+        "params": [
+          "Vote_candidateId_fkey",
+          "public",
+          "\"public\".\"Vote\"",
+          "f",
+          "[\"candidateId\"]",
+          "\"public\".\"Candidate\"",
+          "[\"id\"]",
+          "c",
+          "a"
+        ]
+      }
+    ]
+  }
+]
