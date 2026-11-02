@@ -42,7 +42,6 @@ const getGroup = async (groupId: string) => {
 const statusOf = async (groupId: string) => (await getGroup(groupId)).status as Status;
 const roundsOf = (groupId: string) => db.orm.public.Round.where({ groupId }).all();
 
-// The action must be refused with `error`, and the group's status must not change
 async function blocked(
   groupId: string, error: string, label: string,
   fn: () => Promise<{ ok: boolean; error?: string }>
