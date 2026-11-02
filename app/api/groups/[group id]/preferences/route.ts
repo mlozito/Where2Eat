@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { getMember } from "@/src/server/auth/session";
-import { parseBody, route } from "@/src/server/lib/api";
-import { savePreference } from "@/src/server/services/preferences";
-import { preferenceSchema } from "@/src/shared/preferenceSchemas";
+import { parseBody, route } from "@/src/prisma/lib/api";
+import { savePreference } from "@/src/prisma/server/services/preferences";
+import { preferenceSchema } from "@/src/prisma/shared/preferenceSchemas";
 
 type Context = { params: Promise<{ groupId: string }> };
 

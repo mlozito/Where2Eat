@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { requireHost } from "@/src/server/auth/session";
-import { parseBody, route } from "@/src/server/lib/api";
-import { setGroupLocation } from "@/src/server/services/preferences";
-import { locationSchema } from "@/src/shared/preferenceSchemas";
+import { parseBody, route } from "@/src/prisma/lib/api";
+import { setGroupLocation } from "@/src/prisma/server/services/preferences";
+import { locationSchema } from "@/src/prisma/shared/preferenceSchemas";
 
 type Context = { params: Promise<{ groupId: string }> };
 
