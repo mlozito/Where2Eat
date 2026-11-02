@@ -33,3 +33,17 @@ export class NotFoundError extends AppError {
     super(404, "NOT_FOUND", message);
   }
 }
+
+// 409: the request clashes with the current state (wrong stage, wrong mode, etc.)
+export class ConflictError extends AppError {
+  constructor(message = "That conflicts with the current state") {
+    super(409, "CONFLICT", message);
+  }
+}
+
+// 502: an outside service failed
+export class ExternalServiceError extends AppError {
+  constructor(message = "An outside service failed") {
+    super(502, "UPSTREAM_ERROR", message);
+  }
+}
