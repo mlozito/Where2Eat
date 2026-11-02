@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 const popularCuisines = [
   "Italian",
@@ -29,6 +30,7 @@ const dietaryOptions = [
 ];
 
 export default function PreferencesPage() {
+  const router = useRouter();
   const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(50);
 
@@ -121,6 +123,7 @@ export default function PreferencesPage() {
     );
 
     setMessage("Preferences saved successfully!");
+    router.push("/restaurant_search");
   }
 
   return (
