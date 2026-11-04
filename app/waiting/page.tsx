@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { getCurrentGroupAndMembers, configureGroup } from "./actions";
 import DemoViewToggle from "../_components/DemoViewToggle";
 import RestaurantDetails from "../_components/RestaurantDetails";
 import {
@@ -21,6 +22,146 @@ export default function WaitingPage() {
   const router = useRouter();
   const { group, loaded, now, update } = useDemoGroup();
   const [confirmingSkip, setConfirmingSkip] = useState(false);
+
+const [realGroup, setRealGroup] = useState<any>(null);
+const [configuring, setConfiguring] = useState(false);
+
+//temporary
+useEffect(() => {
+  async function loadGroup() {
+    const result = await getCurrentGroupAndMembers();
+
+    console.log("REAL GROUP:", result);
+
+    if (result.ok) {
+      setRealGroup(result);
+    }
+  }
+
+  loadGroup();
+}, []);
+
+//Handles host choice for configuring the group mode
+async function handleConfigureGroup(model: "SUGGESTION" | "PREFERENCE") {
+  setConfiguring(true);
+
+  const result = await configureGroup({ model });
+
+  if (!result.ok) {
+    alert("Couldn't configure the group. Please try again.");
+    setConfiguring(false);
+    return;
+  }
+
+  const updatedGroup = await getCurrentGroupAndMembers();
+
+  if (updatedGroup.ok) {
+    setRealGroup(updatedGroup);
+  }
+
+  setConfiguring(false);
+}
+
+
+  if (realGroup?.group.status === "LOBBY") {
+  const isHost = realGroup.me.isHost;
+
+  return (
+    <main className="min-h-screen bg-orange-50 px-4 py-10 text-stone-900">
+      <div className="mx-auto max-w-3xl">
+        <header className="mb-10 text-center">
+          <p className="text-sm font-semibold uppercase tracking-widest text-orange-600">
+            Where2Eat / Waiting room
+          </p>
+
+          <h1 className="mt-3 text-4xl font-bold">
+            Your group is ready!
+          </h1>
+
+          <p className="mt-3 text-stone-600">
+            {isHost
+              ? "Choose how your group wants to decide where to eat."
+              : "Waiting for the host to choose how your group will decide."}
+          </p>
+        </header>
+
+        <section className="mb-6 rounded-2xl bg-white p-6 shadow-sm">
+          <h2 className="mb-4 text-xl font-semibold">Your group</h2>
+
+          <p className="mb-4 text-sm text-stone-500">
+            Invite code: {realGroup.group.inviteCode}
+          </p>
+
+          <ul className="divide-y divide-stone-100">
+            {realGroup.members.map((member: any) => (
+              <li key={member.id} className="py-3">
+                <span className="font-medium">
+                  {member.displayName}
+                </span>
+
+                {member.isHost && (
+                  <span className="ml-2 rounded-full bg-orange-100 px-2 py-1 text-xs font-semibold text-orange-800">
+                    Host
+                  </span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        {isHost ? (
+          <section className="rounded-2xl bg-white p-6 shadow-sm">
+            <h2 className="mb-2 text-xl font-semibold">
+              Choose your group mode
+            </h2>
+
+            <p className="mb-5 text-sm text-stone-500">
+              Everyone will follow the method you choose.
+            </p>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <button
+                type="button"
+                disabled={configuring}
+                onClick={() => handleConfigureGroup("SUGGESTION")}
+                className="rounded-xl bg-orange-600 p-6 text-left text-white transition hover:bg-orange-700 disabled:bg-stone-300"
+              >
+                <span className="mb-2 block text-2xl">🍽️</span>
+                <span className="block text-lg font-semibold">
+                  Suggestion Mode
+                </span>
+                <span className="mt-2 block text-sm">
+                  Everyone suggests one restaurant, then votes on their favorite.
+                </span>
+              </button>
+
+              <button
+                type="button"
+                disabled={configuring}
+                onClick={() => handleConfigureGroup("PREFERENCE")}
+                className="rounded-xl border border-orange-200 p-6 text-left transition hover:bg-orange-50 disabled:opacity-50"
+              >
+                <span className="mb-2 block text-2xl">❤️</span>
+                <span className="block text-lg font-semibold">
+                  Preference Mode
+                </span>
+                <span className="mt-2 block text-sm text-stone-600">
+                  Everyone shares their food preferences to find a restaurant together.
+                </span>
+              </button>
+            </div>
+          </section>
+        ) : (
+          <section className="rounded-2xl bg-white p-8 text-center shadow-sm">
+            <p className="text-lg font-medium">
+              Waiting for the host to choose a group mode...
+            </p>
+          </section>
+        )}
+      </div>
+    </main>
+  );
+}
 
   if (!loaded) {
     return (

@@ -78,6 +78,26 @@ export async function findMemberByToken(token: string) {
   return db.orm.public.Member.where({ sessionTokenHash: sha256(token) }).first();
 }
 
+//Get group and members for the current session
+export async function getGroupAndMembersByToken(token: string){
+  const member = await findMemberByToken(token);
+
+  if(!member){
+    return { ok: false as const, error: "NOT_FOUND" as const };
+  }
+
+  const group = await db.orm.public.Group.where({ id: member.groupId }).first();
+  
+  if(!group){
+    return { ok: false as const, error: "NOT_FOUND" as const };
+  }
+
+  const members = await db.orm.public.Member.where({ groupId: group.id }).all();
+  return { ok: true as const, me: { id: member.id, displayName: member.displayName, isHost: member.isHost }, 
+  group:{ id: group.id, inviteCode: group.inviteCode, status: group.status, model: group.model, decisionType: group.decisionType, location: group.location }, 
+  members: members.map((member) => ({ id: member.id, displayName: member.displayName, isHost: member.isHost })) };
+}
+
 
 // STATE TRANSITIONS
 // loadContext determines current state
