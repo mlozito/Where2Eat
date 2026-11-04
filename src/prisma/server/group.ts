@@ -1,11 +1,11 @@
 "use server";
 
-import { randomBytes, randomInt, createHash } from "node:crypto";
+import { randomBytes, randomInt } from "node:crypto";
 import { db } from "../../prisma/db";
 import { tally } from "./tally"; 
+import { sha256 } from "../lib/crypto"
 
-const sha256 = (s: string) => createHash("sha256").update(s).digest("hex");
-
+// invite code generation
 const CODE_CHARS = "ABCDEFGHJKMNPQRSTUVWXYZ23456789"; // no 0/O/1/I
 const CODE_LENGTH = 6;
 
@@ -72,12 +72,6 @@ export async function joinGroupRecord(rawInviteCode: string, displayName: string
   });
   return { ok: true as const, groupId: group.id, token };
 }
-
-// Helper function
-export async function findMemberByToken(token: string) {
-  return db.orm.public.Member.where({ sessionTokenHash: sha256(token) }).first();
-}
-
 
 // STATE TRANSITIONS
 // loadContext determines current state
@@ -252,6 +246,7 @@ export async function closeRoundRecord(memberId: string) {
   });
 }
 
+// tie breaker const
 const MAX_ROUNDS = 3;
 
 export async function resolveTieRecord(memberId: string, choice: "REVOTE" | "RANDOM") {
@@ -313,5 +308,49 @@ export async function getRoundSummaryRecord(memberId: string) {
       iVoted: votes.some((v) => v.memberId === memberId),
       counts: latest.status === "CLOSED" ? counts : null,
     },
+  };
+}
+
+// Everything a page needs to render the current stage. Polled by the UI.
+export async function getGroupStateRecord(memberId: string) {
+  const ctx = await loadContext(memberId);
+  if (!ctx) return { ok: false as const, error: "NOT_FOUND" as const };
+  const { member, group } = ctx;
+
+  const members = await db.orm.public.Member.where({ groupId: group.id }).all();
+  const candidates = await db.orm.public.Candidate.where({ groupId: group.id }).all();
+  const result = await db.orm.public.Result.where({ groupId: group.id }).first();
+  const rounds = await db.orm.public.Round.where({ groupId: group.id }).all();
+  const latest = rounds.length
+    ? rounds.reduce((a, b) => (b.number > a.number ? b : a))
+    : null;
+
+  let round = null;
+  if (latest) {
+    const ballot = await db.orm.public.RoundCandidate.where({ roundId: latest.id }).all();
+    const { votes, counts } = await roundTally(db, latest.id);
+    round = {
+      number: latest.number,
+      status: latest.status,
+      ballotIds: ballot.map((b) => b.candidateId),
+      votesCast: votes.length,
+      iVoted: votes.some((v) => v.memberId === member.id),
+      counts: latest.status === "CLOSED" ? counts : null,
+    };
+  }
+
+  return {
+    ok: true as const,
+    me: { id: member.id, displayName: member.displayName, isHost: member.isHost },
+    group: {
+      id: group.id, inviteCode: group.inviteCode, status: group.status,
+      model: group.model, decisionType: group.decisionType, location: group.location,
+    },
+    members: members.map((m) => ({ id: m.id, displayName: m.displayName, isHost: m.isHost })),
+    candidates: candidates.map((c) => ({
+      id: c.id, source: c.source, mine: c.suggestedByMemberId === member.id, ...(c.snapshot as object),
+    })),
+    round,
+    winnerId: result?.candidateId ?? null,
   };
 }

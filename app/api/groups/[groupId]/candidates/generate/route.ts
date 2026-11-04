@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requireHost } from "@/src/server/auth/session";
+import { requireHost } from "@/src/prisma/server/session";
 import { route } from "@/src/prisma/lib/api";
 import { generateCandidates } from "@/src/prisma/server/services/candidates";
 
