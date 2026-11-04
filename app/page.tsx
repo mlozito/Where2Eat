@@ -86,7 +86,7 @@ export default function Home() {
         </Link>
 
         <Link
-          href="/join-group"
+          href="/join"
           className="rounded-full border border-orange-200 px-5 py-2.5 font-medium transition hover:bg-orange-100"
         >
           Join a Group
@@ -121,7 +121,7 @@ export default function Home() {
           </Link>
 
           <Link
-            href="/join-group"
+            href="/join"
             className="rounded-full border border-orange-200 bg-white px-8 py-4 text-center font-semibold transition hover:bg-orange-100"
           >
             Join a Group
@@ -189,7 +189,7 @@ export default function Home() {
               const code = groupCode.trim();
 
               if (code) {
-                window.location.href = `/join-group?code=${encodeURIComponent(code)}`;
+                window.location.href = `/join?code=${encodeURIComponent(code)}`;
               }
             }}
           >
@@ -214,7 +214,7 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="border-t border-orange-100 px-6 py-6 text-center text-sm text-neutral-500">
-        Where2Eat © 2026 · Good food, better together.
+        Where2Eat © 2026 · Good food, better together. //we can def change this slogan, i js couldnt rmb if we had one
       </footer>
     </main>
   );

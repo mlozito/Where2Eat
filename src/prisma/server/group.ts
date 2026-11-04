@@ -1,13 +1,13 @@
+"use server";
+
 import { randomBytes, randomInt, createHash } from "node:crypto";
 import { db } from "../../prisma/db";
 import { tally } from "./tally"; 
 
-"use server";
-
-export const sha256 = (s: string) => createHash("sha256").update(s).digest("hex");
+const sha256 = (s: string) => createHash("sha256").update(s).digest("hex");
 
 const CODE_CHARS = "ABCDEFGHJKMNPQRSTUVWXYZ23456789"; // no 0/O/1/I
-export const CODE_LENGTH = 6;
+const CODE_LENGTH = 6;
 
 const makeInviteCode = () =>
   Array.from({ length: CODE_LENGTH }, () => CODE_CHARS[randomInt(CODE_CHARS.length)]).join("");
@@ -252,7 +252,7 @@ export async function closeRoundRecord(memberId: string) {
   });
 }
 
-export const MAX_ROUNDS = 3;
+const MAX_ROUNDS = 3;
 
 export async function resolveTieRecord(memberId: string, choice: "REVOTE" | "RANDOM") {
   const ctx = await loadContext(memberId);
