@@ -1,10 +1,11 @@
 "use server";
 
-import { randomBytes, randomInt, createHash } from "node:crypto";
+import { randomBytes, randomInt } from "node:crypto";
 import { db } from "../../prisma/db";
 import { tally } from "./tally"; 
+import { sha256 } from "../lib/crypto"
 
-const sha256 = (s: string) => createHash("sha256").update(s).digest("hex");
+
 
 const CODE_CHARS = "ABCDEFGHJKMNPQRSTUVWXYZ23456789"; // no 0/O/1/I
 const CODE_LENGTH = 6;

@@ -52,18 +52,30 @@ export async function generateCandidates(groupId: string) {
       saved.push({ id: row.id, rank: index + 1, ...snapshot });
     }
 
-    if (bestFit) {
+        const decisionType = group.decisionType;
+
+    if (decisionType === "BEST_FIT" || decisionType === "RANDOM") {
+      const winner = decisionType === "BEST_FIT"
+        ? saved[0]
+        : saved[Math.floor(Math.random() * saved.length)];
       await tx.orm.public.Result.create({
-        groupId,
-        candidateId: saved[0].id,
-        method: "BEST_FIT",
+        groupId, candidateId: winner.id, method: decisionType,
       });
+      await tx.orm.public.Group.where({ id: groupId }).update({ status: "COMPLETE" });
+      return { status: "COMPLETE" as const, candidates: saved };
     }
-    await tx.orm.public.Group.where({ id: groupId }).update({
-      status: bestFit ? "COMPLETE" : "DECIDING",
-    });
-    return saved;
+
+    // VOTE: open round 1 with all 6 candidates on the ballot
+    const round = await tx.orm.public.Round.create({ groupId, number: 1 });
+    await tx.orm.public.RoundCandidate.createAll(
+      saved.map((c) => ({ roundId: round.id, candidateId: c.id }))
+    );
+    await tx.orm.public.Group.where({ id: groupId }).update({ status: "DECIDING" });
+    return { status: "DECIDING" as const, candidates: saved };
   });
 
-  return { status: bestFit ? "COMPLETE" : "DECIDING", candidates };
+  return candidates;
 }
+
+
+
