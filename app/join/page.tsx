@@ -23,13 +23,15 @@ export default function JoinGroup() {
       displayName: displayName,
     });
 
-    if (result.error) {
-      setError(result.error);
+
+    if (result.error || !result.groupId) {
+      setError(result.error ?? "Couldn't join with that code.");
       setLoading(false);
       return;
     }
 
-    router.push(`/lobby?group=${groupCode}`);
+    router.push(`/lobby?group=${result.groupId}`);
+  
   }
 
   return (

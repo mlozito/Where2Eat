@@ -13,6 +13,8 @@ export default function CreateGroup() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const [groupId, setGroupId] = useState("");
+
   async function handleCreate(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
@@ -30,6 +32,7 @@ export default function CreateGroup() {
     }
 
     setInviteCode(result.inviteCode);
+    setGroupId(result.groupId);
     setLoading(false);
   }
 
@@ -136,7 +139,7 @@ export default function CreateGroup() {
 
               <button
                 type="button"
-                onClick={() => router.push(`lobby?group=${inviteCode}`)}
+                onClick={() => router.push(`/lobby?group=${groupId}`)}
                 className="mt-3 w-full rounded-full bg-orange-500 px-8 py-4 font-semibold text-white shadow-sm transition hover:bg-orange-600"
               >
                 Go to Lobby →
