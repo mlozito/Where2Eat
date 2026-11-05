@@ -4,6 +4,8 @@ import { randomBytes, randomInt } from "node:crypto";
 import { db } from "../../prisma/db";
 import { tally } from "./tally"; 
 import { sha256 } from "../lib/crypto"
+import { canTransition, Status } from "./lifecycle";
+import { MAX_ROUNDS } from "./lifecycle";
 
 // invite code generation
 const CODE_CHARS = "ABCDEFGHJKMNPQRSTUVWXYZ23456789"; // no 0/O/1/I
@@ -56,9 +58,8 @@ export async function joinGroupRecord(rawInviteCode: string, displayName: string
   const inviteCode = normalizeCode(rawInviteCode);
 
   const group = await db.orm.public.Group.where({ inviteCode }).first();
-  if (!group || group.status === "COMPLETE") {
-    return { ok: false as const, error: "NOT_FOUND" as const };
-  }
+  if (!group) return { ok: false as const, error: "NOT_FOUND" as const };
+  if (group.status !== "LOBBY") return { ok: false as const, error: "ALREADY_STARTED" as const };
 
   const taken = await db.orm.public.Member
     .where({ groupId: group.id, displayName }).first();
@@ -91,7 +92,11 @@ export async function configureGroupRecord(memberId: string, input: {
   const ctx = await loadContext(memberId);
   if (!ctx) return { ok: false as const, error: "NOT_FOUND" as const };
   if (!ctx.member.isHost) return { ok: false as const, error: "NOT_HOST" as const };
-  if (ctx.group.status !== "LOBBY") return { ok: false as const, error: "WRONG_STATE" as const };
+  if (!canTransition(ctx.group.status as Status, "COLLECTING"))
+  return { ok: false as const, error: "WRONG_STATE" as const };
+
+  if (input.model === "PREFERENCE" && !input.location?.trim())
+  return { ok: false as const, error: "LOCATION_REQUIRED" as const };
 
   if (input.decisionType === "BEST_FIT" && input.model !== "PREFERENCE")
     return { ok: false as const, error: "INVALID_COMBINATION" as const };
@@ -102,7 +107,7 @@ export async function configureGroupRecord(memberId: string, input: {
     .update({
       model: input.model,
       decisionType: input.decisionType,
-      location: input.location ?? null,
+      location: input.location?.trim() || null,
       status: "COLLECTING",
     });
   return { ok: true as const };
@@ -149,7 +154,7 @@ export async function startDecisionRecord(memberId: string) {
   return db.transaction(async (tx) => {
     // Re-read inside the transaction so the checks and writes see the same state
     const group = await tx.orm.public.Group.where({ id: ctx.group.id }).first();
-    if (!group || group.status !== "COLLECTING" || group.model !== "SUGGESTION")
+    if (!group || group.status !== "COLLECTING" || group.decisionType === "BEST_FIT")
       return { ok: false as const, error: "WRONG_STATE" as const };
 
     const candidates = await tx.orm.public.Candidate.where({ groupId: group.id }).all();
@@ -245,9 +250,6 @@ export async function closeRoundRecord(memberId: string) {
     return { ok: true as const, outcome: "TIE_BREAK" as const, tiedCandidateIds: leaders, counts };
   });
 }
-
-// tie breaker const
-const MAX_ROUNDS = 3;
 
 export async function resolveTieRecord(memberId: string, choice: "REVOTE" | "RANDOM") {
   const ctx = await loadContext(memberId);
