@@ -3,13 +3,13 @@ import { z } from "zod";
 // These are Yelp "category aliases". A wrong alias just returns fewer
 // results, but double-check them against Yelp's category list.
 export const CUISINE_OPTIONS = [
-  "pizza", "italian", "mexican", "tacos", "chinese", "japanese", "sushi",
-  "ramen", "thai", "indian", "korean", "vietnamese", "mediterranean",
-  "greek", "french", "bbq", "burgers", "sandwiches", "seafood", "steak",
-  "breakfast_brunch", "chicken_wings", "salad",
+  "Pizza", "Italian", "Mexican", "Tacos", "Chinese", "Japanese", "Sushi",
+  "Ramen", "Thai", "Indian", "Korean", "Vietnamese", "Mediterranean",
+  "Greek", "French", "BBQ", "Burgers", "Sandwiches", "Seafood", "Steak",
+  "Breakfast Brunch", "Chicken Wings", "Salad",
 ] as const;
 
-export const DIETARY_OPTIONS = ["vegetarian", "vegan", "gluten_free", "dairy_free", "kosher", "seafood", "shellfish"] as const;
+export const DIETARY_OPTIONS = ["Vegetarian", "Vegan", "Gluten free", "Dairy free", "Kosher", "Seafood", "Shellfish"] as const;
 
 export const preferenceSchema = z.object({
   cuisines: z.array(z.enum(CUISINE_OPTIONS)).max(5).optional(),

@@ -38,7 +38,7 @@ export default function CreateGroup() {
       {/* Navigation */}
       <nav className="flex items-center justify-between px-6 py-6 md:px-12">
         <Link href="/" className="text-2xl font-bold tracking-tight">
-          Where2Eat<span className="text-orange-500">.</span>
+          Where2Eat
         </Link>
 
         <Link
@@ -50,14 +50,11 @@ export default function CreateGroup() {
       </nav>
 
       {/* Create Group Form */}
-      <section className="mx-auto flex max-w-6xl justify-center px-6 py-12 md:py-20">
+      <section className="mx-auto flex max-w-6xl justify-center px-6">
         <div className="w-full max-w-xl rounded-3xl border border-orange-100 bg-white p-8 shadow-sm md:p-10">
           {!inviteCode ? (
             <>
               <div className="text-center">
-                <p className="text-sm font-semibold uppercase tracking-widest text-orange-500">
-                  Where2Eat
-                </p>
 
                 <h1 className="mt-3 text-4xl font-bold">
                   Create a Group
@@ -101,7 +98,7 @@ export default function CreateGroup() {
                   disabled={loading || !displayName.trim()}
                   className="w-full rounded-full bg-orange-500 px-8 py-4 font-semibold text-white shadow-sm transition hover:bg-orange-600 disabled:cursor-not-allowed disabled:bg-neutral-300"
                 >
-                  {loading ? "Creating..." : "Create Group →"}
+                  {loading ? "Creating..." : "Create Group"}
                 </button>
               </form>
             </>
@@ -115,11 +112,11 @@ export default function CreateGroup() {
                 Invite Your Friends
               </h1>
 
-              <p className="mt-4 leading-7 text-neutral-600">
+              <p className="mt-4 leading-3 text-neutral-600">
                 Share this code with your friends so they can join your group.
               </p>
 
-              <div className="mt-8 rounded-2xl bg-orange-50 p-6">
+              <div className="mt-8 rounded-1xl bg-orange-50 p-6">
                 <p className="text-sm font-semibold text-neutral-600">
                   YOUR GROUP CODE
                 </p>
@@ -139,15 +136,18 @@ export default function CreateGroup() {
 
               <button
                 type="button"
-                onClick={() => router.push("/waiting")}
+                onClick={() => router.push(`lobby?group=${inviteCode}`)}
                 className="mt-3 w-full rounded-full bg-orange-500 px-8 py-4 font-semibold text-white shadow-sm transition hover:bg-orange-600"
               >
-                Go to Waiting Room →
+                Go to Lobby →
               </button>
             </div>
           )}
         </div>
       </section>
+      {/* Footer */}
+      <footer className="border-t border-orange-100 px-6 py-6 text-center text-sm text-neutral-500">
+      </footer>
     </main>
   );
 }

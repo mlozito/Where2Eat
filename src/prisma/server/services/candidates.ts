@@ -3,6 +3,7 @@ import { ConflictError, NotFoundError } from "../../lib/errors";
 import { buildSearchQuery, pickTopRestaurants } from "./matching";
 import { loadGroupPreferences } from "./preferences";
 import { searchRestaurants } from "./yelp";
+import { canTransition, type Status } from "../lifecycle";
 
 const CANDIDATE_COUNT = 6;
 
@@ -17,6 +18,11 @@ export async function generateCandidates(groupId: string) {
   if (!group.decisionType) throw new ConflictError("Choose a decision type first");
   if (group.status !== "COLLECTING") throw new ConflictError("The group is not collecting preferences right now");
   if (!group.location) throw new ConflictError("Set a location first");
+
+  const already = await db.orm.public.Candidate.where({ groupId }).all();
+  if (already.length > 0) throw new ConflictError("Restaurants were already chosen for this group");
+  if (!canTransition(group.status as Status, "COMPLETE") && group.decisionType === "BEST_FIT")
+    throw new ConflictError("The group can't finish from this stage");
 
   const prefs = await loadGroupPreferences(groupId);
   if (prefs.length === 0) throw new ConflictError("Nobody has submitted preferences yet");
@@ -35,7 +41,8 @@ export async function generateCandidates(groupId: string) {
 
   const bestFit = group.decisionType === "BEST_FIT";
 
-  // All or nothing: candidates, the group's new status, and (for best fit) the result.
+  // All or nothing. Only best fit completes the group here;
+  // vote and random continue through startDecisionRecord.
   const candidates = await db.transaction(async (tx) => {
     const saved = [];
     for (const [index, { restaurant, score }] of top.entries()) {
@@ -45,36 +52,24 @@ export async function generateCandidates(groupId: string) {
         source: "YELP",
         yelpBusinessId: restaurant.yelpId ?? null,
         suggestedByMemberId: null,
-        // JSON round-trip drops undefined fields so the database accepts it.
         snapshot: JSON.parse(JSON.stringify(snapshot)),
         rank: index + 1,
       });
       saved.push({ id: row.id, rank: index + 1, ...snapshot });
     }
 
-        const decisionType = group.decisionType;
-
-    if (decisionType === "BEST_FIT" || decisionType === "RANDOM") {
-      const winner = decisionType === "BEST_FIT"
-        ? saved[0]
-        : saved[Math.floor(Math.random() * saved.length)];
+    if (bestFit) {
       await tx.orm.public.Result.create({
-        groupId, candidateId: winner.id, method: decisionType,
+        groupId,
+        candidateId: saved[0].id,
+        method: "BEST_FIT",
       });
       await tx.orm.public.Group.where({ id: groupId }).update({ status: "COMPLETE" });
-      return { status: "COMPLETE" as const, candidates: saved };
     }
-
-    // VOTE: open round 1 with all 6 candidates on the ballot
-    const round = await tx.orm.public.Round.create({ groupId, number: 1 });
-    await tx.orm.public.RoundCandidate.createAll(
-      saved.map((c) => ({ roundId: round.id, candidateId: c.id }))
-    );
-    await tx.orm.public.Group.where({ id: groupId }).update({ status: "DECIDING" });
-    return { status: "DECIDING" as const, candidates: saved };
+    return saved;
   });
 
-  return candidates;
+  return { status: bestFit ? "COMPLETE" : "COLLECTING", candidates };
 }
 
 

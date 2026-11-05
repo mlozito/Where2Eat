@@ -2,11 +2,15 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { CUISINE_OPTIONS, DIETARY_OPTIONS} from "@/src/prisma/shared/preferenceSchemas";
+
+type Cuisine = (typeof CUISINE_OPTIONS)[number];
+type DietaryRestriction = (typeof DIETARY_OPTIONS)[number];
 
 type Restaurant = {
     id: number;
     name: string;
-    cuisine: string;
+    cuisine: Cuisine;
     price: number;
     distance: number;
     description: string;
@@ -17,12 +21,10 @@ type Preferences = {
     maxPrice: number;
     minDistance: number;
     maxDistance: number;
-    startTime: string;
-    endTime: string;
-    cuisines: string[];
-    dietaryRestrictions: string[];
-    otherDietary?: string;
-    needsRide: boolean;
+    // startTime: string;
+    // endTime: string;
+    cuisines: Cuisine[];
+    dietaryRestrictions: DietaryRestriction[];
 };
 
 const sampleRestaurants: Restaurant[] = [
@@ -61,7 +63,7 @@ const sampleRestaurants: Restaurant[] = [
     {
         id: 5,
         name: "Panera Bread",
-        cuisine: "American",
+        cuisine: "Sandwiches",
         price: 16,
         distance: 2.8,
         description: "Sandwiches, soups, and salads.",
@@ -223,24 +225,9 @@ export default function RestaurantSearchPage() {
                                         : "Any"}
                                 </span>
 
-                                <span className="rounded-full bg-orange-100 px-4 py-2 text-sm font-medium text-orange-800">
+                                {/* <span className="rounded-full bg-orange-100 px-4 py-2 text-sm font-medium text-orange-800">
                                     Time: {preferences.startTime}–{preferences.endTime}
-                                </span>
-
-                                {preferences.dietaryRestrictions.length > 0 && (
-                                    <span className="rounded-full bg-orange-100 px-4 py-2 text-sm font-medium text-orange-800">
-                                        Dietary: {preferences.dietaryRestrictions.join(", ")}
-                                        {preferences.otherDietary
-                                            ? ` (${preferences.otherDietary})`
-                                            : ""}
-                                    </span>
-                                )}
-
-                                {preferences.needsRide && (
-                                    <span className="rounded-full bg-orange-100 px-4 py-2 text-sm font-medium text-orange-800">
-                                        Ride Needed
-                                    </span>
-                                )}
+                                </span> */}
                             </div>
                         </section>
 

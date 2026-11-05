@@ -20,6 +20,13 @@ export class ValidationError extends AppError {
   }
 }
 
+// 401: we don't know who you are
+export class UnauthorizedError extends AppError {
+  constructor(message = "You need to join this group first") {
+    super(401, "UNAUTHORIZED", message);
+  }
+}
+
 // 403: you're not allowed to do this (e.g. a non-host trying to start voting)
 export class ForbiddenError extends AppError {
   constructor(message = "You are not allowed to do that") {

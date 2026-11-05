@@ -9,3 +9,4 @@ const ALLOWED: Record<Status, Status[]> = {
 };
 
 export const canTransition = (from: Status, to: Status) => ALLOWED[from].includes(to);
+export const MAX_ROUNDS = 3;

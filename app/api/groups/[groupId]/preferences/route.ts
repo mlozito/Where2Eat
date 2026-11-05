@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getMember } from "@/src/server/auth/session";
+import { getMember } from "@/src/prisma/server/session";
 import { parseBody, route } from "@/src/prisma/lib/api";
 import { savePreference } from "@/src/prisma/server/services/preferences";
 import { preferenceSchema } from "@/src/prisma/shared/preferenceSchemas";

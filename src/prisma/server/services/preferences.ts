@@ -51,6 +51,7 @@ export async function savePreference(groupId: string, memberId: string, input: P
     await db.orm.public.Preference.where({ id }).update(values);
   };
 
+  if (!memberId) throw new Error("No member ID");
   const existing = await db.orm.public.Preference.where({ memberId }).first();
   if (existing) {
     await update(existing.id);

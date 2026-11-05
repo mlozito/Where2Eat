@@ -1,81 +1,42 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-
-const popularCuisines = [
-  "Italian",
-  "Indian",
-  "Mexican",
-  "Japanese",
-  "Chinese",
-  "Thai",
-  "American",
-  "Mediterranean",
-  "Korean",
-  "Greek",
-  "Vietnamese",
-  "Middle Eastern",
-];
-
-const dietaryOptions = [
-  "Vegetarian",
-  "Vegan",
-  "Halal",
-  "Kosher",
-  "Gluten-Free",
-  "Dairy-Free",
-  "Nut Allergy",
-  "Shellfish Allergy",
-  "Other",
-];
+import { CUISINE_OPTIONS, DIETARY_OPTIONS } from "@/src/prisma/shared/preferenceSchemas";
 
 export default function PreferencesPage() {
   const router = useRouter();
-  const [minPrice, setMinPrice] = useState(0);
-  const [maxPrice, setMaxPrice] = useState(50);
+  const PRICE_LEVELS = [
+  { level: 1, label: "$", hint: "Under $10" },
+  { level: 2, label: "$$", hint: "$11 to $30" },
+  { level: 3, label: "$$$", hint: "$31 to $60" },
+  { level: 4, label: "$$$$", hint: "Over $61" },
+  ] as const;
+  const [maxPriceLevel, setMaxPriceLevel] = useState<number | null>(null);
 
-  const [minDistance, setMinDistance] = useState(0);
   const [maxDistance, setMaxDistance] = useState(15);
 
-  const [startTime, setStartTime] = useState("18:00");
-  const [endTime, setEndTime] = useState("21:00");
+  // const [startTime, setStartTime] = useState("18:00");
+  // const [endTime, setEndTime] = useState("21:00");
 
-  const [cuisines, setCuisines] = useState<string[]>([]);
-  const [customCuisine, setCustomCuisine] = useState("");
+  type Cuisine = (typeof CUISINE_OPTIONS)[number];
+  const [cuisines, setCuisines] = useState<Cuisine[]>([]);
+  const atLimit = cuisines.length >= 5;
 
+  function toggleCuisine(cuisine: Cuisine) {
+    setCuisines((current) => {
+      if (current.includes(cuisine)) return current.filter((c) => c !== cuisine);
+      if (current.length >= 5) return current; // at the limit: ignore
+      return [...current, cuisine];
+    });
+  }
+
+  type DietaryRestriction = (typeof DIETARY_OPTIONS)[number];
   const [dietaryRestrictions, setDietaryRestrictions] =
-    useState<string[]>([]);
-  const [otherDietary, setOtherDietary] = useState("");
+    useState<DietaryRestriction[]>([]);
 
-  const [needsRide, setNeedsRide] = useState(false);
   const [message, setMessage] = useState("");
 
-  function toggleCuisine(cuisine: string) {
-    setCuisines((current) =>
-      current.includes(cuisine)
-        ? current.filter((item) => item !== cuisine)
-        : [...current, cuisine]
-    );
-    setMessage("");
-  }
-
-  function addCuisine() {
-    const cuisine = customCuisine.trim();
-
-    if (
-      cuisine &&
-      !cuisines.some(
-        (item) => item.toLowerCase() === cuisine.toLowerCase()
-      )
-    ) {
-      setCuisines((current) => [...current, cuisine]);
-    }
-
-    setCustomCuisine("");
-    setMessage("");
-  }
-
-  function toggleDietaryRestriction(restriction: string) {
+  function toggleDietaryRestriction(restriction: DietaryRestriction) {
     setDietaryRestrictions((current) =>
       current.includes(restriction)
         ? current.filter((item) => item !== restriction)
@@ -85,36 +46,20 @@ export default function PreferencesPage() {
   }
 
   function savePreferences() {
-    if (startTime >= endTime) {
-      setMessage(
-        "Please select an end time after your start time."
-      );
-      return;
-    }
-
-    if (
-      dietaryRestrictions.includes("Other") &&
-      !otherDietary.trim()
-    ) {
-      setMessage(
-        "Please specify your dietary restriction under Other."
-      );
-      return;
-    }
+    // if (startTime >= endTime) {
+    //   setMessage(
+    //     "Please select an end time after your start time."
+    //   );
+    //   return;
+    // }
 
     const preferences = {
-      minPrice,
-      maxPrice,
-      minDistance,
+      maxPriceLevel,
       maxDistance,
-      startTime,
-      endTime,
+      // startTime,
+      // endTime,
       cuisines,
       dietaryRestrictions,
-      otherDietary: dietaryRestrictions.includes("Other")
-        ? otherDietary.trim()
-        : "",
-      needsRide,
     };
 
     sessionStorage.setItem(
@@ -131,11 +76,11 @@ export default function PreferencesPage() {
       <div className="mx-auto max-w-3xl">
         <header className="mb-8">
           <p className="text-sm font-semibold uppercase tracking-widest text-orange-600">
-            Where2Eat / Preference Mode
+            Preference Mode
           </p>
 
           <h1 className="mt-3 text-4xl font-bold">
-            What&apos;s your food mood?
+            What are you hungry for?
           </h1>
 
           <p className="mt-3 text-stone-600">
@@ -147,122 +92,62 @@ export default function PreferencesPage() {
         <div className="space-y-6">
           <section className="rounded-2xl bg-white p-6 shadow-sm">
             <h2 className="mb-2 text-xl font-semibold">
-              Your Budget
+              Budget
             </h2>
 
             <p className="mb-5 text-sm text-stone-500">
-              Estimated price per person
+              How much are you willing to spend?
+              Prices lower than the selected level will be automatically included.
             </p>
 
-            <div className="mb-4 flex justify-between font-semibold text-orange-700">
-              <span>Minimum: ${minPrice}</span>
-              <span>Maximum: ${maxPrice}</span>
+            <div role="group" aria-label="Maximum price" className="grid grid-cols-4 gap-2">
+              {PRICE_LEVELS.map(({ level, label, hint }) => {
+                const selected = maxPriceLevel === level;
+                const included = maxPriceLevel !== null && level < maxPriceLevel;
+
+                return (
+                  <button
+                    key={level}
+                    type="button"
+                    aria-pressed={selected}
+                    onClick={() => {
+                      setMaxPriceLevel(selected ? null : level);
+                      setMessage("");
+                    }}
+                    className={`rounded-xl border px-2 py-3 text-center transition ${
+                      selected
+                        ? "border-orange-600 bg-orange-600 text-white"
+                        : included
+                          ? "border-orange-300 bg-orange-100 text-orange-800"
+                          : "border-stone-300 bg-white hover:bg-orange-50"
+                    }`}
+                  >
+                    <span className="block text-lg font-semibold">{label}</span>
+                    <span className="block text-xs">{hint}</span>
+                  </button>
+                );
+              })}
             </div>
 
-            <label
-              htmlFor="min-price"
-              className="mb-2 block text-sm"
-            >
-              Minimum price
-            </label>
-
-            <input
-              id="min-price"
-              type="range"
-              min="0"
-              max="100"
-              step="5"
-              value={minPrice}
-              onChange={(event) => {
-                setMinPrice(
-                  Math.min(
-                    Number(event.target.value),
-                    maxPrice
-                  )
-                );
-                setMessage("");
-              }}
-              className="mb-5 w-full accent-orange-600"
-            />
-
-            <label
-              htmlFor="max-price"
-              className="mb-2 block text-sm"
-            >
-              Maximum price
-            </label>
-
-            <input
-              id="max-price"
-              type="range"
-              min="0"
-              max="100"
-              step="5"
-              value={maxPrice}
-              onChange={(event) => {
-                setMaxPrice(
-                  Math.max(
-                    Number(event.target.value),
-                    minPrice
-                  )
-                );
-                setMessage("");
-              }}
-              className="w-full accent-orange-600"
-            />
-
-            <div className="mt-2 flex justify-between text-sm text-stone-500">
-              <span>$0</span>
-              <span>$100</span>
-            </div>
+            <p className="mt-2 text-sm text-stone-600">
+              {maxPriceLevel === null
+                ? "No price limit"
+                : `Up to ${"$".repeat(maxPriceLevel)}`}
+            </p>
           </section>
 
           <section className="rounded-2xl bg-white p-6 shadow-sm">
             <h2 className="mb-2 text-xl font-semibold">
-              How far are you willing to go?
+              Distance
             </h2>
 
             <p className="mb-5 text-sm text-stone-500">
-              Choose your preferred distance range.
+              How far are you willing to travel?
             </p>
 
             <div className="mb-4 flex justify-between font-semibold text-orange-700">
-              <span>Minimum: {minDistance} miles</span>
-              <span>Maximum: {maxDistance} miles</span>
+              <span>{maxDistance} miles</span>
             </div>
-
-            <label
-              htmlFor="min-distance"
-              className="mb-2 block text-sm"
-            >
-              Minimum distance
-            </label>
-
-            <input
-              id="min-distance"
-              type="range"
-              min="0"
-              max="50"
-              step="1"
-              value={minDistance}
-              onChange={(event) => {
-                setMinDistance(
-                  Math.min(
-                    Number(event.target.value),
-                    maxDistance
-                  )
-                );
-                setMessage("");
-              }}
-              className="mb-5 w-full accent-orange-600"
-            />
-
-            <label
-              htmlFor="max-distance"
-              className="mb-2 block text-sm"
-            >
-              Maximum distance
-            </label>
 
             <input
               id="max-distance"
@@ -275,7 +160,6 @@ export default function PreferencesPage() {
                 setMaxDistance(
                   Math.max(
                     Number(event.target.value),
-                    minDistance
                   )
                 );
                 setMessage("");
@@ -289,7 +173,7 @@ export default function PreferencesPage() {
             </div>
           </section>
 
-          <section className="rounded-2xl bg-white p-6 shadow-sm">
+          {/* <section className="rounded-2xl bg-white p-6 shadow-sm">
             <h2 className="mb-4 text-xl font-semibold">
               When are we eating?
             </h2>
@@ -327,62 +211,49 @@ export default function PreferencesPage() {
                 />
               </label>
             </div>
-          </section>
+          </section> */}
 
           <section className="rounded-2xl bg-white p-6 shadow-sm">
             <h2 className="text-xl font-semibold">
-              What sounds good?
+              Cuisines
             </h2>
 
             <p className="mb-5 mt-2 text-sm text-stone-500">
-              Select cuisines or add your own.
+              Select up to 5 cuisines.
               Leave empty if you&apos;re open to anything.
             </p>
-
+            
             <div className="flex flex-wrap gap-2">
-              {popularCuisines.map((cuisine) => (
-                <button
-                  key={cuisine}
-                  type="button"
-                  onClick={() => toggleCuisine(cuisine)}
-                  className={`rounded-full border px-4 py-2 text-sm transition ${
-                    cuisines.includes(cuisine)
-                      ? "border-orange-600 bg-orange-600 text-white"
-                      : "border-stone-300 bg-white hover:bg-orange-50"
-                  }`}
-                >
-                  {cuisine}
-                </button>
-              ))}
+              {CUISINE_OPTIONS.map((cuisine) => {
+                const selected = cuisines.includes(cuisine);
+                const locked = atLimit && !selected;
+
+                return (
+                  <button
+                    key={cuisine}
+                    type="button"
+                    onClick={() => toggleCuisine(cuisine)}
+                    disabled={locked}
+                    aria-pressed={selected}
+                    className={`rounded-full border px-4 py-2 text-sm capitalize transition ${
+                      selected
+                        ? "border-orange-600 bg-orange-600 text-white"
+                        : locked
+                          ? "cursor-not-allowed border-stone-200 bg-stone-100 text-stone-400"
+                          : "border-stone-300 bg-white hover:bg-orange-50"
+                    }`}
+                  >
+                    {cuisine.replace(/_/g, " ")}
+                  </button>
+                );
+              })}
             </div>
 
-            <div className="mt-6 flex gap-2">
-              <input
-                type="text"
-                value={customCuisine}
-                onChange={(event) =>
-                  setCustomCuisine(event.target.value)
-                }
-                onKeyDown={(event) => {
-                  if (event.key === "Enter") {
-                    event.preventDefault();
-                    addCuisine();
-                  }
-                }}
-                placeholder="Add another cuisine..."
-                className="min-w-0 flex-1 rounded-lg border border-stone-300 p-3"
-              />
-
-              <button
-                type="button"
-                onClick={addCuisine}
-                className="rounded-lg bg-orange-600 px-5 text-white hover:bg-orange-700"
-              >
-                Add
-              </button>
-            </div>
-
-            {cuisines.length > 0 && (
+            <p aria-live="polite" className="mt-2 min-h-5 text-sm text-stone-500">
+              {atLimit ? "You've picked 5. Deselect one to choose another." : ""}
+            </p>
+                
+            {cuisines.length > 0 &&(
               <div className="mt-5 rounded-xl bg-orange-50 p-4">
                 <p className="mb-3 text-sm font-semibold">
                   Selected cuisines
@@ -409,8 +280,68 @@ export default function PreferencesPage() {
               Dietary Restrictions
             </h2>
 
-            <div className="grid gap-3 sm:grid-cols-2">
-              {dietaryOptions.map((restriction) => (
+            <p className="mb-5 mt-2 text-sm text-stone-500">
+              Select your dietary restrictions.
+              Leave empty if you have none.
+            </p>
+
+            <div className="flex flex-wrap gap-2">
+              {DIETARY_OPTIONS.map((restriction) => {
+                const selected = dietaryRestrictions.includes(restriction);
+
+                return (
+                  <button
+                    key={restriction}
+                    type="button"
+                    onClick={() => toggleDietaryRestriction(restriction)}
+                    aria-pressed={selected}
+                    className={`rounded-full border px-4 py-2 text-sm capitalize transition ${
+                      selected
+                        ? "border-orange-600 bg-orange-600 text-white"
+                        : "border-stone-300 bg-white hover:bg-orange-50"
+                    }`}
+                  >
+                    {restriction.replace(/_/g, " ")}
+                  </button>
+                );
+              })}
+            </div>
+                
+            {dietaryRestrictions.length > 0 &&(
+              <div className="mt-5 rounded-xl bg-orange-50 p-4">
+                <p className="mb-3 text-sm font-semibold">
+                  Selected dietary restrictions
+                </p>
+
+                <div className="flex flex-wrap gap-2">
+                  {dietaryRestrictions.map((restriction) => (
+                    <button
+                      key={restriction}
+                      type="button"
+                      onClick={() => toggleDietaryRestriction(restriction)}
+                      className="rounded-full bg-white px-3 py-2 text-sm text-orange-800"
+                    >
+                      {restriction} ×
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+
+
+
+
+
+
+
+
+
+
+
+
+            {/* <div className="grid gap-3 sm:grid-cols-2">
+              {DIETARY_OPTIONS.map((restriction) => (
                 <label
                   key={restriction}
                   className="flex items-center gap-3 rounded-lg border border-stone-200 p-3"
@@ -429,48 +360,7 @@ export default function PreferencesPage() {
                   <span>{restriction}</span>
                 </label>
               ))}
-            </div>
-
-            {dietaryRestrictions.includes("Other") && (
-              <div className="mt-5">
-                <label
-                  htmlFor="other-dietary"
-                  className="mb-2 block text-sm font-medium"
-                >
-                  Please specify your dietary restriction
-                </label>
-
-                <input
-                  id="other-dietary"
-                  type="text"
-                  value={otherDietary}
-                  onChange={(event) => {
-                    setOtherDietary(event.target.value);
-                    setMessage("");
-                  }}
-                  placeholder="e.g. Soy allergy, Jain diet, low sodium..."
-                  className="w-full rounded-lg border border-stone-300 p-3 focus:border-orange-500 focus:outline-none"
-                />
-              </div>
-            )}
-          </section>
-
-          <section className="rounded-2xl bg-white p-6 shadow-sm">
-            <label className="flex items-center gap-3">
-              <input
-                type="checkbox"
-                checked={needsRide}
-                onChange={(event) => {
-                  setNeedsRide(event.target.checked);
-                  setMessage("");
-                }}
-                className="h-5 w-5 accent-orange-600"
-              />
-
-              <span className="font-medium">
-                I&apos;ll need a ride
-              </span>
-            </label>
+            </div> */}
           </section>
 
           <section className="rounded-2xl bg-orange-100 p-6">
@@ -480,16 +370,16 @@ export default function PreferencesPage() {
 
             <div className="space-y-2">
               <p>
-                Budget: ${minPrice}–${maxPrice} per person
+                Budget: {maxPriceLevel ? "$".repeat(maxPriceLevel) : "No limit"}
               </p>
 
               <p>
-                Distance: {minDistance}–{maxDistance} miles
+                Distance: {maxDistance} miles
               </p>
 
-              <p>
+              {/* <p>
                 Time: {startTime}–{endTime}
-              </p>
+              </p> */}
 
               <p>
                 Cuisines:{" "}
@@ -501,22 +391,8 @@ export default function PreferencesPage() {
               <p>
                 Dietary restrictions:{" "}
                 {dietaryRestrictions.length > 0
-                  ? dietaryRestrictions
-                      .map((restriction) =>
-                        restriction === "Other" &&
-                        otherDietary.trim()
-                          ? `Other: ${otherDietary.trim()}`
-                          : restriction
-                      )
-                      .join(", ")
-                  : "None selected"}
-              </p>
-
-              <p>
-                Transportation:{" "}
-                {needsRide
-                  ? "Ride needed"
-                  : "No ride needed"}
+                  ? dietaryRestrictions.join(", ")
+                  : "None"}
               </p>
             </div>
           </section>
@@ -535,7 +411,7 @@ export default function PreferencesPage() {
             onClick={savePreferences}
             className="w-full rounded-xl bg-orange-600 px-6 py-4 text-lg font-semibold text-white transition hover:bg-orange-700"
           >
-            Save Preferences →
+            Submit Preferences
           </button>
         </div>
       </div>

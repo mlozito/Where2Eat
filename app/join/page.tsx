@@ -29,7 +29,7 @@ export default function JoinGroup() {
       return;
     }
 
-    router.push("/waiting");
+    router.push(`/lobby?group=${groupCode}`);
   }
 
   return (
@@ -37,7 +37,7 @@ export default function JoinGroup() {
       {/* Navigation */}
       <nav className="flex items-center justify-between px-6 py-6 md:px-12">
         <Link href="/" className="text-2xl font-bold tracking-tight">
-          Where2Eat<span className="text-orange-500">.</span>
+          Where2Eat
         </Link>
 
         <Link
@@ -49,12 +49,9 @@ export default function JoinGroup() {
       </nav>
 
       {/* Join Group Form */}
-      <section className="mx-auto flex max-w-6xl justify-center px-6 py-12 md:py-20">
+      <section className="mx-auto flex max-w-6xl justify-center px-6">
         <div className="w-full max-w-xl rounded-3xl border border-orange-100 bg-white p-8 shadow-sm md:p-10">
           <div className="text-center">
-            <p className="text-sm font-semibold uppercase tracking-widest text-orange-500">
-              Where2Eat
-            </p>
 
             <h1 className="mt-3 text-4xl font-bold">
               Join a Group
@@ -125,6 +122,9 @@ export default function JoinGroup() {
           </form>
         </div>
       </section>
+      {/* Footer */}
+      <footer className="border-t border-orange-100 px-6 py-6 text-center text-sm text-neutral-500">
+      </footer>
     </main>
   );
 }

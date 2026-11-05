@@ -7,3 +7,18 @@ export const joinGroupSchema = z.object({
 });
 
 export type JoinGroupInput = z.infer<typeof joinGroupSchema>;
+
+export const configureGroupSchema = z
+  .object({
+    model: z.enum(["SUGGESTION", "PREFERENCE"]),
+    decisionType: z.enum(["VOTE", "RANDOM", "BEST_FIT"]),
+    location: z.string().trim().max(100).optional(),
+  })
+  .refine((d) => !(d.decisionType === "BEST_FIT" && d.model !== "PREFERENCE"), {
+    message: "Best fit is only available with preferences",
+    path: ["decisionType"],
+  })
+  .refine((d) => d.model !== "PREFERENCE" || !!d.location, {
+    message: "Location is required for preference mode",
+    path: ["location"],
+  });
