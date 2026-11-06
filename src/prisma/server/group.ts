@@ -95,6 +95,14 @@ export async function configureGroupRecord(memberId: string, input: {
   if (!canTransition(ctx.group.status as Status, "COLLECTING"))
   return { ok: false as const, error: "WRONG_STATE" as const };
 
+  // make sure host isn't the only one in the group before advancing
+  const members = await db.orm.public.Member.where({ groupId: ctx.group.id }).all();
+  if (members.length < 2)
+    return { ok: false as const, error: "NOT_ENOUGH_MEMBERS" as const };
+
+  if (input.model === "PREFERENCE" && !input.location?.trim())
+  return { ok: false as const, error: "LOCATION_REQUIRED" as const };
+
   if (input.model === "PREFERENCE" && !input.location?.trim())
   return { ok: false as const, error: "LOCATION_REQUIRED" as const };
 

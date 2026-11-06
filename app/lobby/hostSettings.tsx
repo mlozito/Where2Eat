@@ -11,6 +11,7 @@ const MESSAGES: Record<string, string> = {
   INVALID_COMBINATION: "Best fit is only available with preferences.",
   LOCATION_REQUIRED: "Enter a location for preference mode.",
   INVALID: "Please check your choices.",
+  NOT_ENOUGH_MEMBERS: "Wait for at least one other person to join before starting.",
 };
 
 type Model = "SUGGESTION" | "PREFERENCE";
