@@ -86,7 +86,7 @@ export default function SuggestRoom({ groupId }: { groupId: string }) {
           disabled={pending || !name.trim()}
           className="w-full rounded-full bg-orange-500 px-6 py-3 font-semibold text-white transition hover:bg-orange-600 disabled:bg-stone-300"
         >
-          {pending ? "Submitting…" : "Submit suggestion"}
+          {pending ? "Submitting…" : "Submit Suggestion"}
         </button>
         <p aria-live="polite" className="min-h-5 text-sm text-red-700">{message}</p>
       </form>

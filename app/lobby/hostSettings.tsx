@@ -80,7 +80,7 @@ export default function HostSettings({ groupId }: { groupId: string }) {
           <p className="mb-2 text-sm font-medium">How should the final choice be made?</p>
           <div className="grid gap-2 sm:grid-cols-3">
             <button type="button" aria-pressed={decisionType === "VOTE"} className={choice(decisionType === "VOTE")} onClick={() => setDecisionType("VOTE")}>
-              <span className="block font-semibold">Anonymous vote</span>
+              <span className="block font-semibold">Anonymous Vote</span>
             </button>
             <button type="button" aria-pressed={decisionType === "RANDOM"} className={choice(decisionType === "RANDOM")} onClick={() => setDecisionType("RANDOM")}>
               <span className="block font-semibold">Random</span>
@@ -93,7 +93,7 @@ export default function HostSettings({ groupId }: { groupId: string }) {
               className={choice(decisionType === "BEST_FIT", model !== "PREFERENCE")}
               onClick={() => setDecisionType("BEST_FIT")}
             >
-              <span className="block font-semibold">Best fit</span>
+              <span className="block font-semibold">Best Fit</span>
             </button>
           </div>
         </div>

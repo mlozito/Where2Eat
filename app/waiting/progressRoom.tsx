@@ -65,8 +65,8 @@ export default function ProgressRoom({ groupId }: { groupId: string }) {
     : lobby.decisionType === "BEST_FIT"
       ? "Find our best match"
       : lobby.decisionType === "RANDOM"
-        ? lobby.model === "PREFERENCE" ? "Find restaurants and pick one" : "Pick randomly"
-        : lobby.model === "PREFERENCE" ? "Find restaurants and start voting" : "Start voting";
+        ? lobby.model === "PREFERENCE" ? "Find restaurants and pick one" : "Pick Randomly"
+        : lobby.model === "PREFERENCE" ? "Find restaurants and start voting" : "Start Voting";
 
   const MESSAGES: Record<string, string> = {
   NOT_HOST: "Only the host can do that.",
@@ -143,10 +143,10 @@ export default function ProgressRoom({ groupId }: { groupId: string }) {
                 <p className="mb-5 text-sm text-stone-500">How should the tie be settled?</p>
                 <div className="grid gap-3 sm:grid-cols-2">
                   <button type="button" className={button} disabled={busy} onClick={() => run(() => resolveTieAction(groupId, "REVOTE"))}>
-                    Vote again on the tied options
+                    Vote Again on the Tied Options
                   </button>
                   <button type="button" className={button} disabled={busy} onClick={() => run(() => resolveTieAction(groupId, "RANDOM"))}>
-                    Pick randomly from the tied options
+                    Pick Randomly from the Tied Options
                   </button>
                 </div>
               </>

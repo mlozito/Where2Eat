@@ -65,7 +65,7 @@ export default function VoteRoom({ groupId }: { groupId: string }) {
                 aria-checked={isSelected}
                 onClick={() => { setSelected(option.candidateId); setMessage(""); }}
                 className={`w-full rounded-2xl border-2 bg-white p-5 text-left shadow-sm transition ${
-                  isSelected ? "border-orange-600" : "border-transparent hover:border-orange-200"
+                  isSelected ? "border-orange-500" : "border-transparent hover:border-orange-200"
                 }`}
               >
                 <RestaurantCard snapshot={asSnapshot(option.snapshot)} />
@@ -79,9 +79,9 @@ export default function VoteRoom({ groupId }: { groupId: string }) {
         type="button"
         onClick={submit}
         disabled={!selected || pending}
-        className="mt-6 w-full rounded-xl bg-orange-600 px-6 py-4 text-lg font-semibold text-white transition hover:bg-orange-700 disabled:bg-stone-300"
+        className="mt-6 w-full rounded-full bg-orange-500 px-6 py-4 text-lg font-semibold text-white transition hover:bg-orange-600 disabled:bg-stone-300"
       >
-        {pending ? "Submitting…" : "Submit vote"}
+        {pending ? "Submitting…" : "Submit Vote"}
       </button>
       <p aria-live="polite" className="mt-3 min-h-5 text-sm text-red-700">{message}</p>
     </Shell>
