@@ -12,8 +12,18 @@ export default function CreateGroup() {
   const [inviteCode, setInviteCode] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
   const [groupId, setGroupId] = useState("");
+  const [copied, setCopied] = useState(false);
+
+  async function copyCode() {
+    try {
+      await navigator.clipboard.writeText(inviteCode);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Clipboard can be blocked; the code is still on screen to read out.
+    }
+  }
 
   async function handleCreate(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -131,10 +141,10 @@ export default function CreateGroup() {
 
               <button
                 type="button"
-                onClick={() => navigator.clipboard.writeText(inviteCode)}
+                onClick={copyCode}
                 className="mt-5 w-full rounded-full border border-orange-200 px-8 py-3 font-semibold transition hover:bg-orange-100"
               >
-                Copy Group Code
+                {copied ? "Copied ✓" : "Copy Group Code"}
               </button>
 
               <button
@@ -142,7 +152,7 @@ export default function CreateGroup() {
                 onClick={() => router.push(`/lobby?group=${groupId}`)}
                 className="mt-3 w-full rounded-full bg-orange-500 px-8 py-4 font-semibold text-white shadow-sm transition hover:bg-orange-600"
               >
-                Go to Lobby →
+                Go to Lobby
               </button>
             </div>
           )}
