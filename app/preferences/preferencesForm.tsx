@@ -131,7 +131,7 @@ export default function PreferencesForm({ groupId }: { groupId: string }) {
                     }}
                     className={`rounded-xl border px-2 py-3 text-center transition ${
                       selected
-                        ? "border-orange-600 bg-orange-600 text-white"
+                        ? "border-orange-500 bg-orange-500 text-white"
                         : included
                           ? "border-orange-300 bg-orange-100 text-orange-800"
                           : "border-stone-300 bg-white hover:bg-orange-50"
@@ -179,7 +179,7 @@ export default function PreferencesForm({ groupId }: { groupId: string }) {
                 );
                 setMessage("");
               }}
-              className="w-full accent-orange-600"
+              className="w-full accent-orange-500"
             />
 
             <div className="mt-2 flex justify-between text-sm text-stone-500">
@@ -212,7 +212,7 @@ export default function PreferencesForm({ groupId }: { groupId: string }) {
                     aria-pressed={selected}
                     className={`rounded-full border px-4 py-2 text-sm capitalize transition ${
                       selected
-                        ? "border-orange-600 bg-orange-600 text-white"
+                        ? "border-orange-500 bg-orange-500 text-white"
                         : locked
                           ? "cursor-not-allowed border-stone-200 bg-stone-100 text-stone-400"
                           : "border-stone-300 bg-white hover:bg-orange-50"
@@ -272,7 +272,7 @@ export default function PreferencesForm({ groupId }: { groupId: string }) {
                     aria-pressed={selected}
                     className={`rounded-full border px-4 py-2 text-sm capitalize transition ${
                       selected
-                        ? "border-orange-600 bg-orange-600 text-white"
+                        ? "border-orange-500 bg-orange-500 text-white"
                         : "border-stone-300 bg-white hover:bg-orange-50"
                     }`}
                   >
@@ -376,7 +376,7 @@ export default function PreferencesForm({ groupId }: { groupId: string }) {
             type="button"
             onClick={savePreferences}
             disabled={saving}
-            className="w-full rounded-xl bg-orange-600 px-6 py-4 text-lg font-semibold text-white transition hover:bg-orange-700 disabled:bg-stone-300"
+            className="w-full rounded-full bg-orange-500 px-6 py-4 text-lg font-semibold text-white transition hover:bg-orange-600 disabled:bg-stone-300"
           >
             {saving ? "Saving…" : "Submit Preferences"}
           </button>

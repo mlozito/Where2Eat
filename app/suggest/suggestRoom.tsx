@@ -52,8 +52,8 @@ export default function SuggestRoom({ groupId }: { groupId: string }) {
         <p className="mt-3 text-stone-600">
           Suggest one restaurant.{" "}
           {lobby.decisionType === "RANDOM"
-            ? "Once everyone's in, one suggestion gets picked at random."
-            : "Once everyone's in, the group votes anonymously."}
+            ? "Once everyone's done, one suggestion gets picked at random."
+            : "Once everyone's done, the group votes anonymously."}
         </p>
       </header>
 
@@ -64,8 +64,9 @@ export default function SuggestRoom({ groupId }: { groupId: string }) {
             value={name}
             onChange={(e) => { setName(e.target.value); setMessage(""); }}
             maxLength={100}
+            placeholder="Enter a restaurant"
             required
-            className="w-full rounded-xl border border-stone-300 px-4 py-2"
+            className="w-full rounded-full border border-orange-200 px-5 py-3 outline-none focus:ring-2 focus:ring-orange-400"
           />
         </label>
         <label className="block">
@@ -76,13 +77,14 @@ export default function SuggestRoom({ groupId }: { groupId: string }) {
             value={address}
             onChange={(e) => setAddress(e.target.value)}
             maxLength={200}
-            className="w-full rounded-xl border border-stone-300 px-4 py-2"
+            placeholder="Enter an address or area"
+            className="w-full rounded-full border border-orange-200 px-5 py-3 outline-none focus:ring-2 focus:ring-orange-400"
           />
         </label>
         <button
           type="submit"
           disabled={pending || !name.trim()}
-          className="w-full rounded-xl bg-orange-600 px-6 py-3 font-semibold text-white transition hover:bg-orange-700 disabled:bg-stone-300"
+          className="w-full rounded-full bg-orange-500 px-6 py-3 font-semibold text-white transition hover:bg-orange-600 disabled:bg-stone-300"
         >
           {pending ? "Submitting…" : "Submit suggestion"}
         </button>

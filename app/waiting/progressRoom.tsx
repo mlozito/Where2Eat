@@ -7,7 +7,7 @@ import { advanceGroupAction, resolveTieAction } from "./actions";
 import { MAX_ROUNDS } from "@/src/prisma/server/lifecycle";
 
 const button =
-  "rounded-xl bg-orange-600 px-6 py-4 text-lg font-semibold text-white transition hover:bg-orange-700 disabled:cursor-not-allowed disabled:bg-stone-300";
+  "rounded-full bg-orange-500 px-6 py-4 text-lg font-semibold text-white transition hover:bg-orange-600 disabled:cursor-not-allowed disabled:bg-stone-300";
 
 function Shell({ children }: { children: ReactNode }) {
   return (
@@ -29,7 +29,7 @@ export default function ProgressRoom({ groupId }: { groupId: string }) {
       <Shell>
         <div className="rounded-2xl bg-white p-10 text-center shadow-sm">
           <h1 className="mb-3 text-2xl font-semibold">{error}</h1>
-          <Link href="/join" className="inline-block rounded-xl bg-orange-600 px-6 py-3 font-semibold text-white hover:bg-orange-700">
+          <Link href="/join" className="inline-block rounded-full bg-orange-500 px-6 py-3 font-semibold text-white hover:bg-orange-600">
             Join a group
           </Link>
         </div>
@@ -91,7 +91,7 @@ export default function ProgressRoom({ groupId }: { groupId: string }) {
     <Shell>
       <header className="mb-8">
         <p className="text-sm font-semibold uppercase tracking-widest text-orange-600">
-          Where2Eat / Waiting room
+          Waiting room
         </p>
         <h1 className="mt-3 text-4xl font-bold">{heading}</h1>
 
@@ -102,7 +102,7 @@ export default function ProgressRoom({ groupId }: { groupId: string }) {
             </p>
             <div className="mt-3 h-2 overflow-hidden rounded-full bg-orange-100">
               <div
-                className="h-full rounded-full bg-orange-600 transition-all"
+                className="h-full rounded-full bg-orange-500 transition-all"
                 style={{ width: `${(doneCount / members.length) * 100}%` }}
               />
             </div>

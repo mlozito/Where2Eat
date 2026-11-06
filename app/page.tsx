@@ -90,7 +90,7 @@ export default function Home() {
       <section className="mx-auto flex max-w-6xl flex-col items-center px-6 py-12 text-center md:py-20">
 
         <h1 className="max-w-4xl text-1xl font-bold leading-tight tracking-tight sm:text-6xl md:text-2xl">
-          Tired of the endless <span className="text-orange-400"><em>&quot;Where do you wanna eat?&quot;</em></span> conversation? Bring your friends together and find a restaurant
+          Tired of the endless <span className="text-orange-600"><em>&quot;Where do you wanna eat?&quot;</em></span> conversation? Bring your friends together and find a restaurant
           everyone can enjoy.
         </h1>
 

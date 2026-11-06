@@ -41,7 +41,7 @@ export default function ResultRoom({ groupId }: { groupId: string }) {
           href={mapsUrl(snapshot)}
           target="_blank"
           rel="noreferrer"
-          className="mt-6 inline-block rounded-xl bg-orange-600 px-6 py-3 font-semibold text-white hover:bg-orange-700"
+          className="mt-6 inline-block rounded-full bg-orange-500 px-6 py-3 font-semibold text-white hover:bg-orange-600"
         >
           Open in Maps
         </a>

@@ -119,7 +119,7 @@ export default function JoinGroup() {
               disabled={loading || groupCode.length !== 6 || !displayName.trim()}
               className="w-full rounded-full bg-orange-500 px-8 py-4 font-semibold text-white shadow-sm transition hover:bg-orange-600 disabled:cursor-not-allowed disabled:bg-neutral-300"
             >
-              {loading ? "Joining..." : "Join Group →"}
+              {loading ? "Joining..." : "Join Group"}
             </button>
           </form>
         </div>
