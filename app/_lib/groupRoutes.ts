@@ -1,26 +1,33 @@
-type GroupSummary = {
-  groupId: string;
-  status: string;
-  model: string | null;
-  decisionType: string | null;
-};
+import type { LobbyState } from "@/src/prisma/server/services/lobby";
 
-// TODO: change the page names to match our real flow
-export function pathForGroup(g: GroupSummary): string {
-  const q = `?group=${encodeURIComponent(g.groupId)}`;
+// controls for each page transition based on candidate mode / decision mode
+type Stage = Pick<LobbyState, "groupId" | "status" | "model" | "youDone" | "result">;
 
+// allowedPaths: each avaliable path based on state
+export function allowedPaths(g: Stage): string[] {
   switch (g.status) {
+    case "LOBBY":
+      return ["/lobby"];
     case "COLLECTING":
-      return g.model === "PREFERENCE" ? `/preferences${q}` : `/restaurant_search${q}`;
+      if (g.youDone) return ["/waiting"];
+      return [g.model === "PREFERENCE" ? "/preferences" : "/suggest"];
     case "DECIDING":
+      return g.youDone ? ["/waiting"] : ["/vote"];
     case "TIE_BREAK":
-      return `/waiting${q}`;
-    case "COMPLETE":
-      if (g.decisionType === "RANDOM") return `/wheel${q}`;
-      if (g.decisionType === "BEST_FIT") return `/best_match${q}`;
-      if (g.decisionType === "VOTE") return `/vote${q}`;
-      return `/result${q}`;
+      return ["/waiting"];
+    case "COMPLETE": {
+      const random = g.result?.method === "RANDOM" || g.result?.method === "TIE_RANDOM";
+      return random ? ["/random", "/result"] : ["/result"];
+    }
     default:
-      return `/lobby${q}`;
+      return ["/lobby"];
   }
+}
+
+export function withGroup(path: string, groupId: string) {
+  return `${path}?group=${encodeURIComponent(groupId)}`;
+}
+
+export function pathForGroup(g: Stage): string {
+  return withGroup(allowedPaths(g)[0], g.groupId);
 }

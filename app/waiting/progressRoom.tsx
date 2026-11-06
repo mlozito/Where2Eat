@@ -1,10 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useEffect, useState, type ReactNode } from "react";
-import { pathForGroup } from "../_lib/groupRoutes";
-import { useLobby } from "../_lib/useLobby";
+import { useState, type ReactNode } from "react";
+import { useGroupStage } from "../_lib/useGroupStage";
 import { advanceGroupAction, resolveTieAction } from "./actions";
 import { MAX_ROUNDS } from "@/src/prisma/server/lifecycle";
 
@@ -20,17 +18,11 @@ function Shell({ children }: { children: ReactNode }) {
 }
 
 export default function ProgressRoom({ groupId }: { groupId: string }) {
-  const router = useRouter();
-  const { lobby, error, refresh } = useLobby(groupId);
+  // page control with group flow
+  const { lobby, error, refresh, ready } = useGroupStage(groupId);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [skipping, setSkipping] = useState(false); // host chose to go on without stragglers
-
-  // When the group is finished, everyone moves to the result.
-  const target = lobby?.status === "COMPLETE" ? pathForGroup(lobby) : null;
-  useEffect(() => {
-    if (target) router.push(target);
-  }, [target, router]);
 
   if (error) {
     return (
@@ -44,7 +36,7 @@ export default function ProgressRoom({ groupId }: { groupId: string }) {
       </Shell>
     );
   }
-  if (!lobby) {
+  if (!lobby || !ready) {
     return (
       <Shell>
         <p className="text-center text-lg font-medium">Loading...</p>
@@ -70,11 +62,11 @@ export default function ProgressRoom({ groupId }: { groupId: string }) {
 
   const continueLabel = voting
     ? "Reveal the results"
-    : lobby.model === "PREFERENCE"
-      ? "Find restaurants"
+    : lobby.decisionType === "BEST_FIT"
+      ? "Find our best match"
       : lobby.decisionType === "RANDOM"
-        ? "Pick randomly"
-        : "Start voting";
+        ? lobby.model === "PREFERENCE" ? "Find restaurants and pick one" : "Pick randomly"
+        : lobby.model === "PREFERENCE" ? "Find restaurants and start voting" : "Start voting";
 
   const MESSAGES: Record<string, string> = {
   NOT_HOST: "Only the host can do that.",
@@ -119,18 +111,6 @@ export default function ProgressRoom({ groupId }: { groupId: string }) {
       </header>
 
       <div className="space-y-6">
-        {!lobby.youDone && !tie && (
-          <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-orange-100 p-6">
-            <p className="font-medium">You aren&apos;t done yet.</p>
-            <Link
-              href={voting ? `/vote?group=${groupId}` : pathForGroup(lobby)}
-              className="rounded-xl bg-orange-600 px-5 py-2 font-semibold text-white hover:bg-orange-700"
-            >
-              {voting ? "Vote now" : "Continue"}
-            </Link>
-          </div>
-        )}
-
         <section className="rounded-2xl bg-white p-6 shadow-sm">
           <h2 className="mb-4 text-xl font-semibold">Your group</h2>
           <ul aria-live="polite" className="divide-y divide-stone-100">

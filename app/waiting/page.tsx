@@ -1,11 +1,6 @@
+import { GroupPage, type GroupPageProps } from "../_components/groupPage";
 import ProgressRoom from "./progressRoom";
 
-export default async function WaitingPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ group?: string }>;
-}) {
-  const { group } = await searchParams;
-  if (!group) return <p className="p-6">No group selected.</p>;
-  return <ProgressRoom groupId={group} />;
+export default function WaitingPage({ searchParams }: GroupPageProps) {
+  return <GroupPage searchParams={searchParams} Room={ProgressRoom} />;
 }
