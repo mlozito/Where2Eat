@@ -56,7 +56,7 @@ export default function RandomRoom({ groupId }: { groupId: string }) {
       <div
         aria-live="polite"
         className={`rounded-3xl p-10 text-center shadow-sm transition ${
-          done ? "scale-105 bg-orange-600 text-white" : "bg-white"
+          done ? "scale-105 bg-orange-500 text-white" : "bg-white"
         }`}
       >
         <p className="text-3xl font-bold">{names[index] ?? "…"}</p>
@@ -67,7 +67,7 @@ export default function RandomRoom({ groupId }: { groupId: string }) {
           <li
             key={`${n}-${i}`}
             className={`rounded-lg px-3 py-1 text-sm transition ${
-              i === index ? "bg-orange-600 text-white" : "bg-white text-stone-600"
+              i === index ? "bg-orange-500 text-white" : "bg-white text-stone-600"
             }`}
           >
             {n}
@@ -79,9 +79,9 @@ export default function RandomRoom({ groupId }: { groupId: string }) {
         <div className="mt-8 text-center">
           <Link
             href={withGroup("/result", groupId)}
-            className="inline-block rounded-xl bg-orange-600 px-8 py-4 text-lg font-semibold text-white hover:bg-orange-700"
+            className="inline-block rounded-full bg-orange-500 px-8 py-4 text-lg font-semibold text-white hover:bg-orange-600"
           >
-            See the details →
+            See Details
           </Link>
         </div>
       )}

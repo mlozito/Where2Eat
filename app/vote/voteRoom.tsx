@@ -51,7 +51,7 @@ export default function VoteRoom({ groupId }: { groupId: string }) {
         <h1 className="mt-3 text-4xl font-bold">
           {revote ? "Vote again on the tied picks" : "Pick your favorite"}
         </h1>
-        <p className="mt-3 text-stone-600">Nobody will see who you voted for.</p>
+        <p className="mt-3 text-stone-600">Nobody will see what you voted for.</p>
       </header>
 
       <ul role="radiogroup" aria-label="Restaurants" className="space-y-3">

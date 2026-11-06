@@ -175,7 +175,7 @@ export default function WheelPage() {
                 onClick={() => router.push("/result")}
                 className="mt-5 rounded-xl bg-orange-600 px-6 py-3 font-semibold text-white hover:bg-orange-700"
               >
-                See the result →
+                See the result
               </button>
             </div>
           ) : isHost ? (
