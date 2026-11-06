@@ -81,7 +81,7 @@ export default function RandomRoom({ groupId }: { groupId: string }) {
             href={withGroup("/result", groupId)}
             className="inline-block rounded-xl bg-orange-600 px-8 py-4 text-lg font-semibold text-white hover:bg-orange-700"
           >
-            See the details →
+            See the details
           </Link>
         </div>
       )}

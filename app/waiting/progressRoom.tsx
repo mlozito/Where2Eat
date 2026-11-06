@@ -161,7 +161,7 @@ export default function ProgressRoom({ groupId }: { groupId: string }) {
                   disabled={!canContinue || busy}
                   onClick={() => run(() => advanceGroupAction(groupId))}
                 >
-                  {busy ? "Working…" : `${continueLabel} →`}
+                  {busy ? "Working…" : `${continueLabel}`}
                 </button>
 
                 {!allDone && !skipping && waitingOn.length > 0 && (

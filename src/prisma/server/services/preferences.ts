@@ -73,9 +73,10 @@ export async function savePreference(groupId: string, memberId: string, input: P
 // Everyone's preferences, for matching. Never sent to the browser.
 export async function loadGroupPreferences(groupId: string): Promise<MemberPreference[]> {
   const members = await db.orm.public.Member.where({ groupId }).all();
-  const rows = await Promise.all(
-    members.map((m) => db.orm.public.Preference.where({ memberId: m.id }).first()),
-  );
+  const rows = [];
+  for (const m of members) {
+    rows.push(await db.orm.public.Preference.where({ memberId: m.id }).first());
+  }
   return rows.flatMap((row) =>
     row
       ? [{

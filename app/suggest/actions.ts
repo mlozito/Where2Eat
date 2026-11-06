@@ -9,7 +9,7 @@ const suggestionSchema = z.object({
   address: z.string().trim().max(200).optional(),
 });
 
-// COLLECTING, suggestion mode: a member adds their one restaurant.
+// COLLECTING, suggestion mode: a member adds their one restaurant
 export async function addSuggestionAction(groupId: string, raw: unknown) {
   const parsed = suggestionSchema.safeParse(raw);
   if (!parsed.success) {
