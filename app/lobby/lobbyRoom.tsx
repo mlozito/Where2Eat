@@ -1,24 +1,16 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-import { pathForGroup } from "../_lib/groupRoutes";
-import { useLobby } from "../_lib/useLobby";
+import { useGroupStage } from "../_lib/useGroupStage";
 import HostSettings from "./hostSettings";
 
 export default function LobbyRoom({ groupId }: { groupId: string }) {
-  const router = useRouter();
-  const { lobby, error, reconnecting } = useLobby(groupId);
-
-  const target = lobby && lobby.status !== "LOBBY" ? pathForGroup(lobby) : null;
-  useEffect(() => {
-    if (target) router.push(target);
-  }, [target, router]);
+  // moves all members to the right page as soon as the host starts the group
+  const { lobby, error, reconnecting, ready } = useGroupStage(groupId);
 
   if (error) {
     return <p className="rounded-2xl bg-white p-6 text-stone-700 shadow-sm">{error}</p>;
   }
-  if (!lobby) {
+  if (!lobby || !ready) {
     return <p className="rounded-2xl bg-white p-6 text-stone-500 shadow-sm">Loading…</p>;
   }
 

@@ -8,6 +8,7 @@ export function useLobby(groupId: string, intervalMs = 3000) {
   const [error, setError] = useState<string | null>(null);
   const [reconnecting, setReconnecting] = useState(false);
   const [tick, setTick] = useState(0);
+  const [fetchedAt, setFetchedAt] = useState(0); // polls when lobby last bounced back from server
 
   useEffect(() => {
     let cancelled = false;
@@ -45,6 +46,7 @@ export function useLobby(groupId: string, intervalMs = 3000) {
         setError(null);
         setReconnecting(false);
         setLobby(data);
+        setFetchedAt(Date.now());
       } catch {
         if (cancelled) return;
         failures += 1;
@@ -64,5 +66,5 @@ export function useLobby(groupId: string, intervalMs = 3000) {
     };
   }, [groupId, intervalMs, tick]);
 
-  return { lobby, error, reconnecting, refresh: () => setTick((t) => t + 1) };
+  return { lobby, error, reconnecting, fetchedAt, refresh: () => setTick((t) => t + 1) };
 }
