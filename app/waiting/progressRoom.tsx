@@ -61,12 +61,12 @@ export default function ProgressRoom({ groupId }: { groupId: string }) {
         : "Waiting for everyone to pick";
 
   const continueLabel = voting
-    ? "Reveal the results"
+    ? "Reveal Results"
     : lobby.decisionType === "BEST_FIT"
-      ? "Find our best match"
+      ? "Find the Best Match"
       : lobby.decisionType === "RANDOM"
-        ? lobby.model === "PREFERENCE" ? "Find restaurants and pick one" : "Pick Randomly"
-        : lobby.model === "PREFERENCE" ? "Find restaurants and start voting" : "Start Voting";
+        ? lobby.model === "PREFERENCE" ? "Find Restaurants and Pick Randomly" : "Pick Randomly"
+        : lobby.model === "PREFERENCE" ? "Find Restaurants and Start Voting" : "Start Voting";
 
   const MESSAGES: Record<string, string> = {
   NOT_HOST: "Only the host can do that.",
