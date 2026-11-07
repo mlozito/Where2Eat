@@ -2,12 +2,15 @@ import { z } from "zod";
 
 // These are Yelp "category aliases". A wrong alias just returns fewer
 // results, but double-check them against Yelp's category list.
-export const CUISINE_OPTIONS = [
-  "Pizza", "Italian", "Mexican", "Tacos", "Chinese", "Japanese", "Sushi",
-  "Ramen", "Thai", "Indian", "Korean", "Vietnamese", "Mediterranean",
-  "Greek", "French", "BBQ", "Burgers", "Sandwiches", "Seafood", "Steak",
-  "Breakfast Brunch", "Chicken Wings", "Salad",
-] as const;
+export const CUISINES = {
+  pizza: "Pizza", italian: "Italian", mexican: "Mexican", tacos: "Tacos",
+  chinese: "Chinese", japanese: "Japanese", sushi: "Sushi", ramen: "Ramen",
+  thai: "Thai", indpak: "Indian", korean: "Korean", vietnamese: "Vietnamese",
+  mediterranean: "Mediterranean", greek: "Greek", french: "French", bbq: "BBQ",
+  burgers: "Burgers", sandwiches: "Sandwiches", seafood: "Seafood", steak: "Steak",
+  breakfast_brunch: "Breakfast & Brunch", chicken_wings: "Chicken Wings", salad: "Salad",
+} as const;
+export const CUISINE_OPTIONS = Object.keys(CUISINES) as [keyof typeof CUISINES, ...(keyof typeof CUISINES)[]];
 
 export const DIETARY_OPTIONS = ["Vegetarian", "Vegan", "Gluten free", "Dairy free", "Kosher", "Seafood", "Shellfish"] as const;
 
